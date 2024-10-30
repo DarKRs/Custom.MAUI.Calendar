@@ -104,20 +104,20 @@ namespace Custom.MAUI.Calendar
             {
                 // Отдельный вывод для месяца и года с их собственными кнопками навигации
                 var monthLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
-                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
-                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
-                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 18 };
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _nextMonthButton.Clicked += OnNextMonthButtonClicked;
                 monthLayout.Children.Add(_previousMonthButton);
                 monthLayout.Children.Add(_monthLabel);
                 monthLayout.Children.Add(_nextMonthButton);
 
                 var yearLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
-                _previousYearButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousYearButton = new Button { Text = "<", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _previousYearButton.Clicked += OnPreviousYearButtonClicked;
-                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
-                _nextYearButton = new Button { Text = ">", WidthRequest = 50 };
+                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 18 };
+                _nextYearButton = new Button { Text = ">", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _nextYearButton.Clicked += OnNextYearButtonClicked;
                 yearLayout.Children.Add(_previousYearButton);
                 yearLayout.Children.Add(_yearLabel);
@@ -131,16 +131,16 @@ namespace Custom.MAUI.Calendar
             {
                 // Отдельный вывод для месяца и года, год не переключаемый
                 var monthLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
-                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
-                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
-                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 18 };
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _nextMonthButton.Clicked += OnNextMonthButtonClicked;
                 monthLayout.Children.Add(_previousMonthButton);
                 monthLayout.Children.Add(_monthLabel);
                 monthLayout.Children.Add(_nextMonthButton);
 
-                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 18 };
                 _headerLayout.Children.Add(_yearLabel);
                 _headerLayout.Children.Add(monthLayout);
 
@@ -148,12 +148,12 @@ namespace Custom.MAUI.Calendar
             else
             {
                 var monthYearLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
-                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
 
-                _monthYearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _monthYearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 18 };
 
-                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 10, HeightRequest = 30, Padding = new Thickness(5), BackgroundColor = Colors.LightGray, CornerRadius = 15 };
                 _nextMonthButton.Clicked += OnNextMonthButtonClicked;
 
                 monthYearLayout.Children.Add(_previousMonthButton);
@@ -208,7 +208,11 @@ namespace Custom.MAUI.Calendar
                 {
                     Text = day.ToString(),
                     BindingContext = currentDay,
-                    BackgroundColor = Colors.Transparent
+                    BackgroundColor = Colors.Transparent,
+                    WidthRequest = 40,
+                    HeightRequest = 40,
+                    Padding = new Thickness(2),
+                    CornerRadius = 20
                 };
                 dayButton.Clicked += OnDayButtonClicked;
 
