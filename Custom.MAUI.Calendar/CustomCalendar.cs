@@ -12,11 +12,15 @@ namespace Custom.MAUI.Calendar
         // Сетка для отображения календаря
         private Grid _calendarGrid;
         private Label _monthYearLabel;
+        private Label _yearLabel;
+        private Label _monthLabel;
         private DateTime _currentDate;
         // Верхняя панель, содержащая кнопки навигации и метку месяца/года
         private StackLayout _headerLayout;
         private Button _previousMonthButton;
         private Button _nextMonthButton;
+        private Button _previousYearButton;
+        private Button _nextYearButton;
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
         private List<DateTime> _selectedDates = new();
@@ -43,6 +47,16 @@ namespace Custom.MAUI.Calendar
         {
             get => (Color)GetValue(CalendarBackgroundColorProperty);
             set => SetValue(CalendarBackgroundColorProperty, value);
+        }
+
+        // Свойство для выбора режима отображения месяца и года
+        public static readonly BindableProperty DisplayModeProperty =
+            BindableProperty.Create(nameof(DisplayMode),typeof(string),typeof(CustomCalendar),"Default",BindingMode.TwoWay,propertyChanged: OnDisplayModeChanged);
+
+        public string DisplayMode
+        {
+            get => (string)GetValue(DisplayModeProperty);
+            set => SetValue(DisplayModeProperty, value);
         }
 
         public CustomCalendar()
@@ -72,22 +86,82 @@ namespace Custom.MAUI.Calendar
             }
         }
 
+        private static void OnDisplayModeChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomCalendar calendar)
+            {
+                calendar.InitializeCalendar();
+                calendar.CreateCalendarView();
+            }
+        }
+
         private void InitializeCalendar()
         {
             // Верняя панель месяц/год
-            _headerLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Start, Margin = new Thickness(10) };
+            _headerLayout = new StackLayout { Orientation = StackOrientation.Vertical, HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Start, Margin = new Thickness(10) };
 
-            _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
-            _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
+            if (DisplayMode == "SeparateMonthYear")
+            {
+                // Отдельный вывод для месяца и года с их собственными кнопками навигации
+                var monthLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
+                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _nextMonthButton.Clicked += OnNextMonthButtonClicked;
+                monthLayout.Children.Add(_previousMonthButton);
+                monthLayout.Children.Add(_monthLabel);
+                monthLayout.Children.Add(_nextMonthButton);
 
-            _monthYearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                var yearLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
+                _previousYearButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousYearButton.Clicked += OnPreviousYearButtonClicked;
+                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _nextYearButton = new Button { Text = ">", WidthRequest = 50 };
+                _nextYearButton.Clicked += OnNextYearButtonClicked;
+                yearLayout.Children.Add(_previousYearButton);
+                yearLayout.Children.Add(_yearLabel);
+                yearLayout.Children.Add(_nextYearButton);
 
-            _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
-            _nextMonthButton.Clicked += OnNextMonthButtonClicked;
+                _headerLayout.Children.Add(yearLayout);
+                _headerLayout.Children.Add(monthLayout);
 
-            _headerLayout.Children.Add(_previousMonthButton);
-            _headerLayout.Children.Add(_monthYearLabel);
-            _headerLayout.Children.Add(_nextMonthButton);
+            }
+            else if (DisplayMode == "SeparateMonthFixedYear")
+            {
+                // Отдельный вывод для месяца и года, год не переключаемый
+                var monthLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
+                _monthLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _nextMonthButton.Clicked += OnNextMonthButtonClicked;
+                monthLayout.Children.Add(_previousMonthButton);
+                monthLayout.Children.Add(_monthLabel);
+                monthLayout.Children.Add(_nextMonthButton);
+
+                _yearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+                _headerLayout.Children.Add(_yearLabel);
+                _headerLayout.Children.Add(monthLayout);
+
+            }
+            else
+            {
+                var monthYearLayout = new StackLayout { Orientation = StackOrientation.Horizontal, HorizontalOptions = LayoutOptions.Center };
+                _previousMonthButton = new Button { Text = "<", WidthRequest = 50 };
+                _previousMonthButton.Clicked += OnPreviousMonthButtonClicked;
+
+                _monthYearLabel = new Label { HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, FontSize = 20 };
+
+                _nextMonthButton = new Button { Text = ">", WidthRequest = 50 };
+                _nextMonthButton.Clicked += OnNextMonthButtonClicked;
+
+                monthYearLayout.Children.Add(_previousMonthButton);
+                monthYearLayout.Children.Add(_monthYearLabel);
+                monthYearLayout.Children.Add (_nextMonthButton);
+
+                _headerLayout.Children.Add(monthYearLayout);
+            }
 
             // Сетка для отображения дней календаря
             _calendarGrid = new Grid { RowSpacing = 5, ColumnSpacing = 5, VerticalOptions = LayoutOptions.Fill, HorizontalOptions = LayoutOptions.Fill };
@@ -107,7 +181,15 @@ namespace Custom.MAUI.Calendar
         private void CreateCalendarView()
         {
             _calendarGrid.Children.Clear();
-            _monthYearLabel.Text = _currentDate.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
+            if (DisplayMode == "SeparateMonthYear" || DisplayMode == "SeparateMonthFixedYear")
+            {
+                _monthLabel.Text = _currentDate.ToString("MMMM", new CultureInfo("ru-RU"));
+                _yearLabel.Text = _currentDate.Year.ToString();
+            }
+            else
+            {
+                _monthYearLabel.Text = _currentDate.ToString("MMMM yyyy", new CultureInfo("ru-RU"));
+            }
             AddDaysOfWeekLabels();
 
             // Определяем первый день месяца и позицию его в сетке
@@ -191,6 +273,24 @@ namespace Custom.MAUI.Calendar
             if (_currentDate.AddMonths(1) <= MaxDate)
             {
                 _currentDate = _currentDate.AddMonths(1);
+                CreateCalendarView();
+            }
+        }
+
+        private void OnPreviousYearButtonClicked(object sender, EventArgs e)
+        {
+            if (_currentDate.AddYears(-1) >= MinDate)
+            {
+                _currentDate = _currentDate.AddYears(-1);
+                CreateCalendarView();
+            }
+        }
+
+        private void OnNextYearButtonClicked(object sender, EventArgs e)
+        {
+            if (_currentDate.AddYears(1) <= MaxDate)
+            {
+                _currentDate = _currentDate.AddYears(1);
                 CreateCalendarView();
             }
         }

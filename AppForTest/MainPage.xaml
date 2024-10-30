@@ -12,6 +12,7 @@
             <controls:CustomCalendar x:Name="Calendar"
                          SelectedDate="{Binding SelectedDate}"
                          CalendarBackgroundColor="Blue"
+                         DisplayMode="SeparateMonthYear"
                          MinDate="2000-01-01"
                          MaxDate="2100-12-31"/>
             <Image
