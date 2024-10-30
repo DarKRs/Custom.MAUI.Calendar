@@ -10,11 +10,11 @@
             Spacing="25">
 
             <controls:CustomCalendar x:Name="Calendar"
-                         SelectedDate="{Binding SelectedDate}"
-                         CalendarBackgroundColor="Blue"
-                         DisplayMode="SeparateMonthYear"
-                         MinDate="2000-01-01"
-                         MaxDate="2100-12-31"/>
+                      SelectedDate="{Binding SelectedDate}"
+                      CalendarBackgroundColor="LightGray"
+                      DisplayMode="SeparateMonthYear"
+                      MinDate="2000-01-01"
+                      MaxDate="2100-12-31" />
             <Image
                 Source="dotnet_bot.png"
                 HeightRequest="185"
