@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,15 @@ namespace Custom.MAUI.Calendar.Views
             set => SetValue(SelectedDatesProperty, value);
         }
 
+        public static readonly BindableProperty CultureProperty =
+            BindableProperty.Create(nameof(Culture), typeof(CultureInfo), typeof(DaysGridView), CultureInfo.CurrentCulture, propertyChanged: OnCultureChanged);
+
+        public CultureInfo Culture
+        {
+            get => (CultureInfo)GetValue(CultureProperty);
+            set => SetValue(CultureProperty, value);
+        }
+
         public DaysGridView()
         {
             // Инициализация сетки
@@ -54,6 +64,14 @@ namespace Custom.MAUI.Calendar.Views
         }
 
         private static void OnSelectedDatesChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is DaysGridView daysGrid)
+            {
+                daysGrid.BuildDaysGrid();
+            }
+        }
+
+        private static void OnCultureChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is DaysGridView daysGrid)
             {
@@ -137,12 +155,14 @@ namespace Custom.MAUI.Calendar.Views
 
         private void AddDaysOfWeekLabels()
         {
-            string[] daysOfWeek = { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
+            var firstDayOfWeek = Culture.DateTimeFormat.FirstDayOfWeek;
+            var dayNames = Culture.DateTimeFormat.AbbreviatedDayNames;
             for (int i = 0; i < 7; i++)
             {
+                int dayIndex = (i + (int)firstDayOfWeek) % 7;
                 var dayLabel = new Label
                 {
-                    Text = daysOfWeek[i],
+                    Text = dayNames[dayIndex],
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     FontAttributes = FontAttributes.Bold

@@ -1,4 +1,6 @@
-﻿namespace AppForTest
+﻿using System.Globalization;
+
+namespace AppForTest
 {
     public partial class MainPage : ContentPage
     {
@@ -7,6 +9,7 @@
         public MainPage()
         {
             InitializeComponent();
+            //Calendar.Culture = CultureInfo.GetCultureInfo("fr-FR");
         }
 
         private void OnCounterClicked(object sender, EventArgs e)

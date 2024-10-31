@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:Custom.MAUI.Calendar;assembly=Custom.MAUI.Calendar"
+             xmlns:sysglb="clr-namespace:System.Globalization;assembly=netstandard"
              x:Class="AppForTest.MainPage">
 
     <ScrollView>
@@ -10,7 +11,7 @@
             Spacing="25">
 
             <controls:CustomCalendar x:Name="Calendar"
-                      SelectedDate="{Binding SelectedDate}"
+                      SelectedDate="{Binding SelectedDate}"  
                       CalendarBackgroundColor="LightGray"
                       DisplayMode="SeparateMonthYear"
                       MinDate="2000-01-01"

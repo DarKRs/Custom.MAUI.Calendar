@@ -8,6 +8,13 @@ using System.Linq;
 
 namespace Custom.MAUI.Calendar
 {
+    public enum CalendarDisplayMode
+    {
+        Default,
+        SeparateMonthYear,
+        SeparateMonthFixedYear
+    }
+
     public class CustomCalendar : ContentView
     {
         private HeaderView _headerView;
@@ -41,12 +48,21 @@ namespace Custom.MAUI.Calendar
         }
 
         public static readonly BindableProperty DisplayModeProperty =
-            BindableProperty.Create(nameof(DisplayMode), typeof(string), typeof(CustomCalendar), "Default", propertyChanged: OnDisplayModeChanged);
+            BindableProperty.Create(nameof(DisplayMode), typeof(CalendarDisplayMode), typeof(CustomCalendar), CalendarDisplayMode.Default, propertyChanged: OnDisplayModeChanged);
 
-        public string DisplayMode
+        public CalendarDisplayMode DisplayMode
         {
-            get => (string)GetValue(DisplayModeProperty);
+            get => (CalendarDisplayMode)GetValue(DisplayModeProperty);
             set => SetValue(DisplayModeProperty, value);
+        }
+
+        public static readonly BindableProperty CultureProperty =
+            BindableProperty.Create(nameof(Culture), typeof(CultureInfo), typeof(CustomCalendar), CultureInfo.CurrentCulture, propertyChanged: OnCultureChanged);
+
+        public CultureInfo Culture
+        {
+            get => (CultureInfo)GetValue(CultureProperty);
+            set => SetValue(CultureProperty, value);
         }
 
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
@@ -64,7 +80,8 @@ namespace Custom.MAUI.Calendar
             _headerView = new HeaderView
             {
                 DisplayMode = DisplayMode,
-                CurrentDate = _currentDate
+                CurrentDate = _currentDate,
+                Culture = Culture
             };
             _headerView.PreviousMonthClicked += OnPreviousMonthClicked;
             _headerView.NextMonthClicked += OnNextMonthClicked;
@@ -74,7 +91,8 @@ namespace Custom.MAUI.Calendar
             _daysGridView = new DaysGridView
             {
                 CurrentDate = _currentDate,
-                SelectedDates = SelectedDates
+                SelectedDates = SelectedDates,
+                Culture = Culture
             };
             _daysGridView.DaySelected += OnDaySelected;
 
@@ -116,6 +134,16 @@ namespace Custom.MAUI.Calendar
             if (bindable is CustomCalendar calendar)
             {
                 calendar._headerView.DisplayMode = calendar.DisplayMode;
+            }
+        }
+
+        private static void OnCultureChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomCalendar calendar)
+            {
+                calendar._headerView.Culture = calendar.Culture;
+                calendar._daysGridView.Culture = calendar.Culture;
+                calendar.UpdateCalendar();
             }
         }
 
