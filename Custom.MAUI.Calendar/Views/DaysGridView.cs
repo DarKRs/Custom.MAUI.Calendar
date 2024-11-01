@@ -9,13 +9,6 @@ namespace Custom.MAUI.Calendar.Views
 {
     public class DaysGridView : Grid
     {
-        public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
-        public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
-        //
-        private int _currentYearPage = 0;
-        private Button _previousYearPageButton;
-        private Button _nextYearPageButton;
-        //
         public event EventHandler<int> MonthSelected;
         public event EventHandler<int> YearSelected;
         public event EventHandler<DateTime> DaySelected;
@@ -56,11 +49,16 @@ namespace Custom.MAUI.Calendar.Views
             set => SetValue(ViewModeProperty, value);
         }
 
+        public CalendarStyle Style { get; set; }
+
+        public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
+        public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
+
+        private int _currentYearPage = 0;
+
         public DaysGridView()
         {
-            // Инициализация сетки
-
-
+            _currentYearPage = (CurrentDate.Year - MinDate.Year) / 12; 
             BuildGrid();
         }
 
@@ -135,7 +133,6 @@ namespace Custom.MAUI.Calendar.Views
             VerticalOptions = LayoutOptions.Fill;
             HorizontalOptions = LayoutOptions.Fill;
 
-            // Определяем первый день месяца и его позицию
             var firstDayOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
             int startDay = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
 
@@ -152,7 +149,6 @@ namespace Custom.MAUI.Calendar.Views
                 Children.Add(emptyLabel);
             }
 
-            // Добавляем кнопки дней месяца
             for (int day = 1; day <= daysInMonth; day++)
             {
                 var currentDay = new DateTime(CurrentDate.Year, CurrentDate.Month, day);
@@ -161,7 +157,9 @@ namespace Custom.MAUI.Calendar.Views
                 {
                     Text = day.ToString(),
                     BindingContext = currentDay,
-                    BackgroundColor = Colors.Transparent
+                    BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
+                    TextColor = Style?.LabelTextColor ?? Colors.Black,
+                    FontSize = Style?.DayButtonFontSize ?? 14
                 };
 
                 dayButton.Clicked += (s, e) => DaySelected?.Invoke(this, currentDay);
@@ -169,7 +167,7 @@ namespace Custom.MAUI.Calendar.Views
                 // Выделение сегодняшнего дня
                 if (currentDay.Date == DateTime.Today)
                 {
-                    dayButton.BackgroundColor = Colors.Blue;
+                    dayButton.BackgroundColor = Style?.TodayBackgroundColor ?? Colors.LightBlue;
                 }
 
                 // Выделение выбранных дат
@@ -179,14 +177,14 @@ namespace Custom.MAUI.Calendar.Views
                     {
                         if (currentDay.Date == SelectedDates[0].Date)
                         {
-                            dayButton.BackgroundColor = Colors.LightGreen;
+                            dayButton.BackgroundColor = Style?.SelectedDateBackgroundColor ?? Colors.LightGreen;
                         }
                     }
                     else if (SelectedDates.Count == 2)
                     {
                         if (currentDay.Date >= SelectedDates[0].Date && currentDay.Date <= SelectedDates[1].Date)
                         {
-                            dayButton.BackgroundColor = Colors.LightGreen;
+                            dayButton.BackgroundColor = Style?.DateRangeBackgroundColor ?? Colors.LightGreen;
                         }
                     }
                 }
@@ -206,7 +204,6 @@ namespace Custom.MAUI.Calendar.Views
 
         private void BuildMonthsView()
         {
-
             int columns = 3;
             int rows = 4;
             BuildBaseGrid(rows, columns);
@@ -224,7 +221,10 @@ namespace Custom.MAUI.Calendar.Views
                     var monthButton = new Button
                     {
                         Text = months[index],
-                        CommandParameter = index + 1
+                        CommandParameter = index + 1,
+                        BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
+                        TextColor = Style?.LabelTextColor ?? Colors.Black,
+                        FontSize = Style?.DayButtonFontSize ?? 14
                     };
                     monthButton.Clicked += (s, e) =>
                     {
@@ -246,7 +246,7 @@ namespace Custom.MAUI.Calendar.Views
         private void BuildYearsView()
         {
             int columns = 3;
-            int rows = 4;
+            int rows = 5;
             BuildBaseGrid(rows, columns);
 
             int startYear = _currentYearPage * 12 + MinDate.Year;
@@ -257,7 +257,7 @@ namespace Custom.MAUI.Calendar.Views
             }
 
             int year = startYear;
-            for (int row = 0; row < rows; row++)
+            for (int row = 0; row < rows - 1; row++)
             {
                 for (int col = 0; col < columns; col++)
                 {
@@ -267,7 +267,10 @@ namespace Custom.MAUI.Calendar.Views
                     var yearButton = new Button
                     {
                         Text = year.ToString(),
-                        CommandParameter = year
+                        CommandParameter = year,
+                        BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
+                        TextColor = Style?.LabelTextColor ?? Colors.Black,
+                        FontSize = Style?.DayButtonFontSize ?? 14
                     };
                     yearButton.Clicked += (s, e) =>
                     {
@@ -286,18 +289,16 @@ namespace Custom.MAUI.Calendar.Views
             }
 
             // Добавляем кнопки навигации для годов
-            _previousYearPageButton = CreateNavigationButton("<", OnPreviousYearPageClicked);
-            _nextYearPageButton = CreateNavigationButton(">", OnNextYearPageClicked);
+            var previousYearPageButton = CreateNavigationButton("<", OnPreviousYearPageClicked);
+            var nextYearPageButton = CreateNavigationButton(">", OnNextYearPageClicked);
 
-            Grid.SetRow(_previousYearPageButton, rows);
-            Grid.SetColumn(_previousYearPageButton, 0);
-            Grid.SetColumnSpan(_previousYearPageButton, columns / 2);
-            Children.Add(_previousYearPageButton);
+            Grid.SetRow(previousYearPageButton, rows - 1);
+            Grid.SetColumn(previousYearPageButton, 0);
+            Children.Add(previousYearPageButton);
 
-            Grid.SetRow(_nextYearPageButton, rows);
-            Grid.SetColumn(_nextYearPageButton, columns / 2);
-            Grid.SetColumnSpan(_nextYearPageButton, columns - columns / 2);
-            Children.Add(_nextYearPageButton);
+            Grid.SetRow(nextYearPageButton, rows - 1);
+            Grid.SetColumn(nextYearPageButton, columns - 1);
+            Children.Add(nextYearPageButton);
         }
 
         private void OnPreviousYearPageClicked(object sender, EventArgs e)
@@ -311,8 +312,11 @@ namespace Custom.MAUI.Calendar.Views
 
         private void OnNextYearPageClicked(object sender, EventArgs e)
         {
-            _currentYearPage++;
-            BuildGrid();
+            if ((_currentYearPage + 1) * 12 + MinDate.Year <= MaxDate.Year)
+            {
+                _currentYearPage++;
+                BuildGrid();
+            }
         }
 
         private Button CreateNavigationButton(string text, EventHandler clickedHandler)
@@ -323,7 +327,8 @@ namespace Custom.MAUI.Calendar.Views
                 WidthRequest = 40,
                 HeightRequest = 40,
                 Padding = new Thickness(5),
-                BackgroundColor = Colors.LightGray,
+                BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
+                TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
                 CornerRadius = 20
             };
             button.Clicked += clickedHandler;
@@ -344,7 +349,7 @@ namespace Custom.MAUI.Calendar.Views
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     FontAttributes = FontAttributes.Bold,
-                    TextColor = Colors.Black,
+                    TextColor = Style?.LabelTextColor ?? Colors.Black,
                 };
                 Grid.SetColumn(dayLabel, i);
                 Grid.SetRow(dayLabel, 0);
@@ -352,4 +357,5 @@ namespace Custom.MAUI.Calendar.Views
             }
         }
     }
+
 }

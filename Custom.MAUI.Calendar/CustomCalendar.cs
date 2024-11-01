@@ -27,12 +27,11 @@ namespace Custom.MAUI.Calendar
         private HeaderView _headerView;
         private DaysGridView _daysGridView;
 
-        private Grid _mainGrid;
-
         private CalendarViewMode _currentViewMode = CalendarViewMode.Days;
+        private DateTime _currentDate;
 
         public static readonly BindableProperty SelectedDateProperty =
-            BindableProperty.Create(nameof(SelectedDate), typeof(DateTime?), typeof(CustomCalendar), null, BindingMode.TwoWay, propertyChanged: OnSelectedDateChanged);
+            BindableProperty.Create(nameof(SelectedDate), typeof(DateTime?), typeof(CustomCalendar), null, BindingMode.TwoWay);
 
         public DateTime? SelectedDate
         {
@@ -41,7 +40,7 @@ namespace Custom.MAUI.Calendar
         }
 
         public static readonly BindableProperty SelectedDatesProperty =
-            BindableProperty.Create(nameof(SelectedDates), typeof(List<DateTime>), typeof(CustomCalendar), new List<DateTime>(), BindingMode.TwoWay, propertyChanged: OnSelectedDatesChanged);
+            BindableProperty.Create(nameof(SelectedDates), typeof(List<DateTime>), typeof(CustomCalendar), new List<DateTime>(), BindingMode.TwoWay);
 
         public List<DateTime> SelectedDates
         {
@@ -76,10 +75,17 @@ namespace Custom.MAUI.Calendar
             set => SetValue(CultureProperty, value);
         }
 
+        public static readonly BindableProperty StyleProperty =
+            BindableProperty.Create(nameof(Style), typeof(CalendarStyle), typeof(CustomCalendar), new CalendarStyle(), propertyChanged: OnStyleChanged);
+
+        public CalendarStyle Style
+        {
+            get => (CalendarStyle)GetValue(StyleProperty);
+            set => SetValue(StyleProperty, value);
+        }
+
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
-
-        private DateTime _currentDate;
 
         public event EventHandler<DateTime> DateSelected;
         public event EventHandler<(DateTime, DateTime)> DateRangeSelected;
@@ -92,7 +98,8 @@ namespace Custom.MAUI.Calendar
             {
                 DisplayMode = DisplayMode,
                 CurrentDate = _currentDate,
-                Culture = Culture
+                Culture = Culture,
+                Style = Style
             };
             _headerView.PreviousMonthClicked += OnPreviousMonthClicked;
             _headerView.NextMonthClicked += OnNextMonthClicked;
@@ -106,7 +113,10 @@ namespace Custom.MAUI.Calendar
             {
                 CurrentDate = _currentDate,
                 SelectedDates = SelectedDates,
-                Culture = Culture
+                Culture = Culture,
+                Style = Style,
+                MinDate = MinDate,
+                MaxDate = MaxDate
             };
             _daysGridView.DaySelected += OnDaySelected;
             _daysGridView.MonthSelected += OnMonthSelected;
@@ -118,23 +128,7 @@ namespace Custom.MAUI.Calendar
                 Children = { _headerView, _daysGridView }
             };
 
-            _mainGrid = new Grid();
-            _mainGrid.Children.Add(mainLayout);
-
-            Content = _mainGrid;
-        }
-
-        private static void OnSelectedDateChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            
-        }
-
-        private static void OnSelectedDatesChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is CustomCalendar calendar)
-            {
-                calendar._daysGridView.SelectedDates = calendar.SelectedDates;
-            }
+            Content = mainLayout;
         }
 
         private static void OnCalendarBackgroundColorChanged(BindableObject bindable, object oldValue, object newValue)
@@ -153,6 +147,7 @@ namespace Custom.MAUI.Calendar
             if (bindable is CustomCalendar calendar)
             {
                 calendar._headerView.DisplayMode = calendar.DisplayMode;
+                calendar.UpdateCalendar();
             }
         }
 
@@ -164,6 +159,20 @@ namespace Custom.MAUI.Calendar
                 calendar._daysGridView.Culture = calendar.Culture;
                 calendar.UpdateCalendar();
             }
+        }
+
+        private static void OnStyleChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomCalendar calendar)
+            {
+                calendar.ApplyStyles();
+            }
+        }
+
+        private void ApplyStyles()
+        {
+            _headerView.Style = Style;
+            _daysGridView.Style = Style;
         }
 
         private void OnPreviousMonthClicked(object sender, EventArgs e) => ChangeDate(months: -1);
@@ -201,7 +210,7 @@ namespace Custom.MAUI.Calendar
 
         private void OnMonthYearLabelTapped(object sender, EventArgs e)
         {
-            _currentViewMode = CalendarViewMode.Months; // или CalendarViewMode.Years
+            _currentViewMode = CalendarViewMode.Months;
             UpdateCalendar();
         }
 
@@ -224,12 +233,16 @@ namespace Custom.MAUI.Calendar
             if (SelectedDates.Contains(selectedDate))
             {
                 SelectedDates.Clear();
-                SelectedDate = selectedDate;
             }
             else
             {
                 SelectedDates.Add(selectedDate);
-                if (SelectedDates.Count > 1)
+                if (SelectedDates.Count > 2)
+                {
+                    SelectedDates.RemoveAt(0);
+                }
+
+                if (SelectedDates.Count == 2)
                 {
                     SelectedDates = SelectedDates.OrderBy(d => d).ToList();
                     DateRangeSelected?.Invoke(this, (SelectedDates[0], SelectedDates[1]));
@@ -247,12 +260,10 @@ namespace Custom.MAUI.Calendar
             await _daysGridView.FadeTo(0, 200);
             _headerView.CurrentDate = _currentDate;
             _daysGridView.CurrentDate = _currentDate;
-            _daysGridView.SelectedDates = SelectedDates;
             _daysGridView.ViewMode = _currentViewMode;
-            _daysGridView.MinDate = MinDate;
-            _daysGridView.MaxDate = MaxDate;
             _daysGridView.BuildGrid();
             await _daysGridView.FadeTo(1, 200);
         }
     }
+
 }

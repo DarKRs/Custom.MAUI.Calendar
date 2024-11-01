@@ -43,7 +43,6 @@ namespace Custom.MAUI.Calendar.Views
             set => SetValue(CurrentDateProperty, value);
         }
 
-        // Свойство Culture для локализации
         public static readonly BindableProperty CultureProperty =
             BindableProperty.Create(nameof(Culture), typeof(CultureInfo), typeof(HeaderView), CultureInfo.CurrentCulture, propertyChanged: OnCultureChanged);
 
@@ -52,6 +51,8 @@ namespace Custom.MAUI.Calendar.Views
             get => (CultureInfo)GetValue(CultureProperty);
             set => SetValue(CultureProperty, value);
         }
+
+        public CalendarStyle Style { get; set; }
 
         public HeaderView()
         {
@@ -87,7 +88,6 @@ namespace Custom.MAUI.Calendar.Views
         {
             Content = null;
 
-            // Создаём все возможные элементы, которые могут понадобиться
             _monthYearLabel = CreateLabel();
             _monthLabel = CreateLabel();
             _yearLabel = CreateLabel();
@@ -139,10 +139,10 @@ namespace Custom.MAUI.Calendar.Views
             {
                 Orientation = StackOrientation.Vertical,
                 Children =
-                {
-                    _yearLabel,
-                    CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton)
-                },
+            {
+                _yearLabel,
+                CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton)
+            },
                 HorizontalOptions = LayoutOptions.Center
             };
 
@@ -166,7 +166,8 @@ namespace Custom.MAUI.Calendar.Views
                 WidthRequest = 40,
                 HeightRequest = 40,
                 Padding = new Thickness(5),
-                BackgroundColor = Colors.LightGray,
+                BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
+                TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
                 CornerRadius = 20
             };
             button.Clicked += clickedHandler;
@@ -179,8 +180,8 @@ namespace Custom.MAUI.Calendar.Views
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = 18,
-                TextColor = Colors.Black,
+                FontSize = Style?.LabelFontSize ?? 18,
+                TextColor = Style?.LabelTextColor ?? Colors.Black,
             };
         }
 
@@ -193,7 +194,6 @@ namespace Custom.MAUI.Calendar.Views
                 Children = { previousButton, label, nextButton }
             };
         }
-
 
         private void UpdateLabels()
         {
@@ -235,4 +235,5 @@ namespace Custom.MAUI.Calendar.Views
             MonthYearLabelTapped?.Invoke(this, EventArgs.Empty);
         }
     }
+
 }
