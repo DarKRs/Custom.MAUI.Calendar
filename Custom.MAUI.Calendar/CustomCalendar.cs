@@ -15,10 +15,22 @@ namespace Custom.MAUI.Calendar
         SeparateMonthFixedYear
     }
 
+    public enum CalendarViewMode
+    {
+        Days,
+        Months,
+        Years
+    }
+
     public class CustomCalendar : ContentView
     {
         private HeaderView _headerView;
         private DaysGridView _daysGridView;
+
+        private Grid _mainGrid;
+        private ContentView _overlayView;
+
+        private CalendarViewMode _currentViewMode = CalendarViewMode.Days;
 
         public static readonly BindableProperty SelectedDateProperty =
             BindableProperty.Create(nameof(SelectedDate), typeof(DateTime?), typeof(CustomCalendar), null, BindingMode.TwoWay, propertyChanged: OnSelectedDateChanged);
@@ -87,6 +99,9 @@ namespace Custom.MAUI.Calendar
             _headerView.NextMonthClicked += OnNextMonthClicked;
             _headerView.PreviousYearClicked += OnPreviousYearClicked;
             _headerView.NextYearClicked += OnNextYearClicked;
+            _headerView.MonthLabelTapped += OnMonthLabelTapped;
+            _headerView.YearLabelTapped += OnYearLabelTapped;
+            _headerView.MonthYearLabelTapped += OnMonthYearLabelTapped;
 
             _daysGridView = new DaysGridView
             {
@@ -95,6 +110,8 @@ namespace Custom.MAUI.Calendar
                 Culture = Culture
             };
             _daysGridView.DaySelected += OnDaySelected;
+            _daysGridView.MonthSelected += OnMonthSelected;
+            _daysGridView.YearSelected += OnYearSelected;
 
             var mainLayout = new StackLayout
             {
@@ -102,7 +119,10 @@ namespace Custom.MAUI.Calendar
                 Children = { _headerView, _daysGridView }
             };
 
-            Content = mainLayout;
+            _mainGrid = new Grid();
+            _mainGrid.Children.Add(mainLayout);
+
+            Content = _mainGrid;
         }
 
         private static void OnSelectedDateChanged(BindableObject bindable, object oldValue, object newValue)
@@ -189,6 +209,58 @@ namespace Custom.MAUI.Calendar
             DateSelected?.Invoke(this, selectedDate);
         }
 
+        private void OnMonthLabelTapped(object sender, EventArgs e)
+        {
+            _currentViewMode = CalendarViewMode.Months;
+            UpdateCalendar();
+        }
+
+        private void OnYearLabelTapped(object sender, EventArgs e)
+        {
+            _currentViewMode = CalendarViewMode.Years;
+            UpdateCalendar();
+        }
+
+        private void OnMonthYearLabelTapped(object sender, EventArgs e)
+        {
+            _currentViewMode = CalendarViewMode.Months; // или CalendarViewMode.Years
+            UpdateCalendar();
+        }
+
+        private void ShowMonthPicker()
+        {
+            var monthPicker = new MonthPickerView { Culture = Culture };
+            monthPicker.MonthSelected += OnMonthSelected;
+
+            ShowOverlay(monthPicker);
+        }
+
+        private void ShowYearPicker()
+        {
+            var yearPicker = new YearPickerView
+            {
+                StartYear = MinDate.Year,
+                EndYear = MaxDate.Year
+            };
+            yearPicker.YearSelected += OnYearSelected;
+
+            ShowOverlay(yearPicker);
+        }
+
+        private void OnMonthSelected(object sender, int month)
+        {
+            _currentDate = new DateTime(_currentDate.Year, month, 1);
+            _currentViewMode = CalendarViewMode.Days;
+            UpdateCalendar();
+        }
+
+        private void OnYearSelected(object sender, int year)
+        {
+            _currentDate = new DateTime(year, _currentDate.Month, 1);
+            _currentViewMode = CalendarViewMode.Days;
+            UpdateCalendar();
+        }
+
         private void UpdateSelectedDates(DateTime selectedDate)
         {
             if (SelectedDates.Count == 0)
@@ -221,14 +293,46 @@ namespace Custom.MAUI.Calendar
 
             // Обновляем DaysGridView
             _daysGridView.SelectedDates = SelectedDates;
+            _daysGridView.WidthRequest = _mainGrid.Width;
+            _daysGridView.HeightRequest = _mainGrid.Height;
             _daysGridView.BuildDaysGrid();
         }
 
-        private void UpdateCalendar()
+        private async void UpdateCalendar()
         {
+            await _daysGridView.FadeTo(0, 200);
             _headerView.CurrentDate = _currentDate;
             _daysGridView.CurrentDate = _currentDate;
             _daysGridView.SelectedDates = SelectedDates;
+            _daysGridView.ViewMode = _currentViewMode;
+            _daysGridView.MinDate = MinDate;
+            _daysGridView.MaxDate = MaxDate;
+            _daysGridView.BuildDaysGrid();
+            await _daysGridView.FadeTo(1, 200);
+        }
+
+        private void ShowOverlay(View overlayContent)
+        {
+            _overlayView = new ContentView
+            {
+                BackgroundColor = new Color(0, 0, 0, (float)0.5),
+                Content = overlayContent
+            };
+            _overlayView.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(HideOverlay)
+            });
+
+            _mainGrid.Children.Add(_overlayView);
+        }
+
+        private void HideOverlay()
+        {
+            if (_overlayView != null && _mainGrid.Children.Contains(_overlayView))
+            {
+                _mainGrid.Children.Remove(_overlayView);
+                _overlayView = null;
+            }
         }
     }
 }

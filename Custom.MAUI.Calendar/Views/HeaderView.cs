@@ -13,6 +13,9 @@ namespace Custom.MAUI.Calendar.Views
         public event EventHandler NextMonthClicked;
         public event EventHandler PreviousYearClicked;
         public event EventHandler NextYearClicked;
+        public event EventHandler MonthLabelTapped;
+        public event EventHandler YearLabelTapped;
+        public event EventHandler MonthYearLabelTapped;
 
         private Label _monthYearLabel;
         private Label _monthLabel;
@@ -60,6 +63,7 @@ namespace Custom.MAUI.Calendar.Views
             if (bindable is HeaderView headerView)
             {
                 headerView.InitializeHeader();
+                headerView.UpdateLabels();
             }
         }
 
@@ -98,6 +102,12 @@ namespace Custom.MAUI.Calendar.Views
                     var monthLayout = CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton);
                     var yearLayout = CreateNavigationLayout(_previousYearButton, _yearLabel, _nextYearButton);
 
+                    _monthLabel.TextColor = Colors.Black;
+                    _yearLabel.TextColor = Colors.Black;
+
+                    AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
+                    AddLabelTapGesture(_yearLabel, OnYearLabelTapped);
+
                     Content = new StackLayout
                     {
                         Orientation = StackOrientation.Vertical,
@@ -112,6 +122,12 @@ namespace Custom.MAUI.Calendar.Views
 
                     _previousMonthButton = CreateNavigationButton("<", (s, e) => PreviousMonthClicked?.Invoke(this, EventArgs.Empty));
                     _nextMonthButton = CreateNavigationButton(">", (s, e) => NextMonthClicked?.Invoke(this, EventArgs.Empty));
+
+                    AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
+                    AddLabelTapGesture(_yearLabel, OnYearLabelTapped);
+
+                    _monthLabel.TextColor = Colors.Black;
+                    _yearLabel.TextColor = Colors.Black;
 
                     var fixedYearLayout = new StackLayout
                     {
@@ -135,8 +151,33 @@ namespace Custom.MAUI.Calendar.Views
 
                     var defaultLayout = CreateNavigationLayout(_previousMonthButton, _monthYearLabel, _nextMonthButton);
 
+                    _monthYearLabel.TextColor = Colors.Black;
+
+                    AddLabelTapGesture(_monthYearLabel, OnMonthYearLabelTapped);
+
                     Content = defaultLayout;
                     break;
+            }
+
+            if (_monthLabel != null)
+            {
+                var monthTapGesture = new TapGestureRecognizer();
+                monthTapGesture.Tapped += OnMonthLabelTapped;
+                _monthLabel.GestureRecognizers.Add(monthTapGesture);
+            }
+
+            if (_yearLabel != null)
+            {
+                var yearTapGesture = new TapGestureRecognizer();
+                yearTapGesture.Tapped += OnYearLabelTapped;
+                _yearLabel.GestureRecognizers.Add(yearTapGesture);
+            }
+
+            if (_monthYearLabel != null)
+            {
+                var monthYearTapGesture = new TapGestureRecognizer();
+                monthYearTapGesture.Tapped += OnMonthYearLabelTapped;
+                _monthYearLabel.GestureRecognizers.Add(monthYearTapGesture);
             }
 
             UpdateLabels();
@@ -177,6 +218,7 @@ namespace Custom.MAUI.Calendar.Views
             };
         }
 
+
         private void UpdateLabels()
         {
             if (Culture == null)
@@ -193,6 +235,28 @@ namespace Custom.MAUI.Calendar.Views
             {
                 _monthYearLabel.Text = CurrentDate.ToString("MMMM yyyy", Culture);
             }
+        }
+
+        private void AddLabelTapGesture(Label label, EventHandler<TappedEventArgs> tappedHandler)
+        {
+            var tapGesture = new TapGestureRecognizer();
+            tapGesture.Tapped += tappedHandler;
+            label.GestureRecognizers.Add(tapGesture);
+        }
+
+        private void OnMonthLabelTapped(object sender, EventArgs e)
+        {
+            MonthLabelTapped?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnYearLabelTapped(object sender, EventArgs e)
+        {
+            YearLabelTapped?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnMonthYearLabelTapped(object sender, EventArgs e)
+        {
+            MonthYearLabelTapped?.Invoke(this, EventArgs.Empty);
         }
     }
 }
