@@ -352,5 +352,4 @@ namespace Custom.MAUI.Calendar.Views
             }
         }
     }
-
 }

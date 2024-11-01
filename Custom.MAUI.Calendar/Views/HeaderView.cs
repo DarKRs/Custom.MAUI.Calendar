@@ -179,7 +179,8 @@ namespace Custom.MAUI.Calendar.Views
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = 18
+                FontSize = 18,
+                TextColor = Colors.Black,
             };
         }
 
