@@ -87,100 +87,75 @@ namespace Custom.MAUI.Calendar.Views
         {
             Content = null;
 
-            // Инициализация компонентов
+            // Создаём все возможные элементы, которые могут понадобиться
+            _monthYearLabel = CreateLabel();
+            _monthLabel = CreateLabel();
+            _yearLabel = CreateLabel();
+
+            _previousMonthButton = CreateNavigationButton("<", (s, e) => PreviousMonthClicked?.Invoke(this, EventArgs.Empty));
+            _nextMonthButton = CreateNavigationButton(">", (s, e) => NextMonthClicked?.Invoke(this, EventArgs.Empty));
+            _previousYearButton = CreateNavigationButton("<", (s, e) => PreviousYearClicked?.Invoke(this, EventArgs.Empty));
+            _nextYearButton = CreateNavigationButton(">", (s, e) => NextYearClicked?.Invoke(this, EventArgs.Empty));
+
             switch (DisplayMode)
             {
                 case CalendarDisplayMode.SeparateMonthYear:
-                    _monthLabel = CreateLabel();
-                    _yearLabel = CreateLabel();
-
-                    _previousMonthButton = CreateNavigationButton("<", (s, e) => PreviousMonthClicked?.Invoke(this, EventArgs.Empty));
-                    _nextMonthButton = CreateNavigationButton(">", (s, e) => NextMonthClicked?.Invoke(this, EventArgs.Empty));
-                    _previousYearButton = CreateNavigationButton("<", (s, e) => PreviousYearClicked?.Invoke(this, EventArgs.Empty));
-                    _nextYearButton = CreateNavigationButton(">", (s, e) => NextYearClicked?.Invoke(this, EventArgs.Empty));
-
-                    var monthLayout = CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton);
-                    var yearLayout = CreateNavigationLayout(_previousYearButton, _yearLabel, _nextYearButton);
-
-                    _monthLabel.TextColor = Colors.Black;
-                    _yearLabel.TextColor = Colors.Black;
-
-                    AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
-                    AddLabelTapGesture(_yearLabel, OnYearLabelTapped);
-
-                    Content = new StackLayout
-                    {
-                        Orientation = StackOrientation.Vertical,
-                        Children = { yearLayout, monthLayout },
-                        HorizontalOptions = LayoutOptions.Center
-                    };
+                    ConfigureSeparateMonthYearLayout();
                     break;
 
                 case CalendarDisplayMode.SeparateMonthFixedYear:
-                    _monthLabel = CreateLabel();
-                    _yearLabel = CreateLabel();
-
-                    _previousMonthButton = CreateNavigationButton("<", (s, e) => PreviousMonthClicked?.Invoke(this, EventArgs.Empty));
-                    _nextMonthButton = CreateNavigationButton(">", (s, e) => NextMonthClicked?.Invoke(this, EventArgs.Empty));
-
-                    AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
-                    AddLabelTapGesture(_yearLabel, OnYearLabelTapped);
-
-                    _monthLabel.TextColor = Colors.Black;
-                    _yearLabel.TextColor = Colors.Black;
-
-                    var fixedYearLayout = new StackLayout
-                    {
-                        Orientation = StackOrientation.Vertical,
-                        Children =
-                    {
-                        _yearLabel,
-                        CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton)
-                    },
-                        HorizontalOptions = LayoutOptions.Center
-                    };
-
-                    Content = fixedYearLayout;
+                    ConfigureSeparateMonthFixedYearLayout();
                     break;
 
                 default:
-                    _monthYearLabel = CreateLabel();
-
-                    _previousMonthButton = CreateNavigationButton("<", (s, e) => PreviousMonthClicked?.Invoke(this, EventArgs.Empty));
-                    _nextMonthButton = CreateNavigationButton(">", (s, e) => NextMonthClicked?.Invoke(this, EventArgs.Empty));
-
-                    var defaultLayout = CreateNavigationLayout(_previousMonthButton, _monthYearLabel, _nextMonthButton);
-
-                    _monthYearLabel.TextColor = Colors.Black;
-
-                    AddLabelTapGesture(_monthYearLabel, OnMonthYearLabelTapped);
-
-                    Content = defaultLayout;
+                    ConfigureDefaultLayout();
                     break;
             }
 
-            if (_monthLabel != null)
-            {
-                var monthTapGesture = new TapGestureRecognizer();
-                monthTapGesture.Tapped += OnMonthLabelTapped;
-                _monthLabel.GestureRecognizers.Add(monthTapGesture);
-            }
-
-            if (_yearLabel != null)
-            {
-                var yearTapGesture = new TapGestureRecognizer();
-                yearTapGesture.Tapped += OnYearLabelTapped;
-                _yearLabel.GestureRecognizers.Add(yearTapGesture);
-            }
-
-            if (_monthYearLabel != null)
-            {
-                var monthYearTapGesture = new TapGestureRecognizer();
-                monthYearTapGesture.Tapped += OnMonthYearLabelTapped;
-                _monthYearLabel.GestureRecognizers.Add(monthYearTapGesture);
-            }
-
             UpdateLabels();
+        }
+
+        private void ConfigureSeparateMonthYearLayout()
+        {
+            AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
+            AddLabelTapGesture(_yearLabel, OnYearLabelTapped);
+
+            var monthLayout = CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton);
+            var yearLayout = CreateNavigationLayout(_previousYearButton, _yearLabel, _nextYearButton);
+
+            Content = new StackLayout
+            {
+                Orientation = StackOrientation.Vertical,
+                Children = { yearLayout, monthLayout },
+                HorizontalOptions = LayoutOptions.Center
+            };
+        }
+
+        private void ConfigureSeparateMonthFixedYearLayout()
+        {
+            AddLabelTapGesture(_monthLabel, OnMonthLabelTapped);
+
+            var fixedYearLayout = new StackLayout
+            {
+                Orientation = StackOrientation.Vertical,
+                Children =
+                {
+                    _yearLabel,
+                    CreateNavigationLayout(_previousMonthButton, _monthLabel, _nextMonthButton)
+                },
+                HorizontalOptions = LayoutOptions.Center
+            };
+
+            Content = fixedYearLayout;
+        }
+
+        private void ConfigureDefaultLayout()
+        {
+            AddLabelTapGesture(_monthYearLabel, OnMonthYearLabelTapped);
+
+            var defaultLayout = CreateNavigationLayout(_previousMonthButton, _monthYearLabel, _nextMonthButton);
+
+            Content = defaultLayout;
         }
 
         private Button CreateNavigationButton(string text, EventHandler clickedHandler)

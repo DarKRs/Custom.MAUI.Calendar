@@ -61,14 +61,14 @@ namespace Custom.MAUI.Calendar.Views
             // Инициализация сетки
 
 
-            BuildDaysGrid();
+            BuildGrid();
         }
 
         private static void OnCurrentDateChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is DaysGridView daysGrid)
             {
-                daysGrid.BuildDaysGrid();
+                daysGrid.BuildGrid();
             }
         }
 
@@ -76,7 +76,7 @@ namespace Custom.MAUI.Calendar.Views
         {
             if (bindable is DaysGridView daysGrid)
             {
-                daysGrid.BuildDaysGrid();
+                daysGrid.BuildGrid();
             }
         }
 
@@ -84,7 +84,7 @@ namespace Custom.MAUI.Calendar.Views
         {
             if (bindable is DaysGridView daysGrid)
             {
-                daysGrid.BuildDaysGrid();
+                daysGrid.BuildGrid();
             }
         }
 
@@ -92,16 +92,12 @@ namespace Custom.MAUI.Calendar.Views
         {
             if (bindable is DaysGridView daysGrid)
             {
-                daysGrid.BuildDaysGrid();
+                daysGrid.BuildGrid();
             }
         }
 
-        public void BuildDaysGrid()
+        public void BuildGrid()
         {
-            Children.Clear();
-            RowDefinitions.Clear();
-            ColumnDefinitions.Clear();
-
             switch (ViewMode)
             {
                 case CalendarViewMode.Days:
@@ -114,24 +110,30 @@ namespace Custom.MAUI.Calendar.Views
                     BuildYearsView();
                     break;
             }
+        }
 
-            
+        private void BuildBaseGrid(int rows, int columns)
+        {
+            Children.Clear();
+            RowDefinitions.Clear();
+            ColumnDefinitions.Clear();
+
+            for (int i = 0; i < rows; i++)
+                RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+
+            for (int i = 0; i < columns; i++)
+                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
         }
 
         private void BuildDaysView()
         {
+            BuildBaseGrid(7, 7);
             AddDaysOfWeekLabels();
 
             RowSpacing = 5;
             ColumnSpacing = 5;
             VerticalOptions = LayoutOptions.Fill;
             HorizontalOptions = LayoutOptions.Fill;
-
-            for (int i = 0; i < 7; i++)
-                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-
-            for (int i = 0; i < 7; i++)
-                RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
 
             // Определяем первый день месяца и его позицию
             var firstDayOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
@@ -207,15 +209,7 @@ namespace Custom.MAUI.Calendar.Views
 
             int columns = 3;
             int rows = 4;
-
-            for (int i = 0; i < rows; i++)
-            {
-                RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
-            }
-            for (int i = 0; i < columns; i++)
-            {
-                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-            }
+            BuildBaseGrid(rows, columns);
 
             var months = Culture.DateTimeFormat.MonthNames.Take(12).ToArray();
 
@@ -251,19 +245,9 @@ namespace Custom.MAUI.Calendar.Views
 
         private void BuildYearsView()
         {
-
-
             int columns = 3;
             int rows = 4;
-
-            for (int i = 0; i < rows; i++)
-            {
-                RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
-            }
-            for (int i = 0; i < columns; i++)
-            {
-                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-            }
+            BuildBaseGrid(rows, columns);
 
             int startYear = _currentYearPage * 12 + MinDate.Year;
             int endYear = startYear + 11;
@@ -321,14 +305,14 @@ namespace Custom.MAUI.Calendar.Views
             if (_currentYearPage > 0)
             {
                 _currentYearPage--;
-                BuildDaysGrid();
+                BuildGrid();
             }
         }
 
         private void OnNextYearPageClicked(object sender, EventArgs e)
         {
             _currentYearPage++;
-            BuildDaysGrid();
+            BuildGrid();
         }
 
         private Button CreateNavigationButton(string text, EventHandler clickedHandler)

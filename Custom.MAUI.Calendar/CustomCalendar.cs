@@ -167,38 +167,17 @@ namespace Custom.MAUI.Calendar
             }
         }
 
-        private void OnPreviousMonthClicked(object sender, EventArgs e)
-        {
-            if (_currentDate.AddMonths(-1) >= MinDate)
-            {
-                _currentDate = _currentDate.AddMonths(-1);
-                UpdateCalendar();
-            }
-        }
+        private void OnPreviousMonthClicked(object sender, EventArgs e) => ChangeDate(months: -1);
+        private void OnNextMonthClicked(object sender, EventArgs e) => ChangeDate(months: 1);
+        private void OnPreviousYearClicked(object sender, EventArgs e) => ChangeDate(years: -1);
+        private void OnNextYearClicked(object sender, EventArgs e) => ChangeDate(years: 1);
 
-        private void OnNextMonthClicked(object sender, EventArgs e)
+        private void ChangeDate(int months = 0, int years = 0)
         {
-            if (_currentDate.AddMonths(1) <= MaxDate)
+            var newDate = _currentDate.AddMonths(months).AddYears(years);
+            if (newDate >= MinDate && newDate <= MaxDate)
             {
-                _currentDate = _currentDate.AddMonths(1);
-                UpdateCalendar();
-            }
-        }
-
-        private void OnPreviousYearClicked(object sender, EventArgs e)
-        {
-            if (_currentDate.AddYears(-1) >= MinDate)
-            {
-                _currentDate = _currentDate.AddYears(-1);
-                UpdateCalendar();
-            }
-        }
-
-        private void OnNextYearClicked(object sender, EventArgs e)
-        {
-            if (_currentDate.AddYears(1) <= MaxDate)
-            {
-                _currentDate = _currentDate.AddYears(1);
+                _currentDate = newDate;
                 UpdateCalendar();
             }
         }
@@ -263,39 +242,25 @@ namespace Custom.MAUI.Calendar
 
         private void UpdateSelectedDates(DateTime selectedDate)
         {
-            if (SelectedDates.Count == 0)
+            if (SelectedDates.Contains(selectedDate))
             {
-                SelectedDates.Add(selectedDate);
+                SelectedDates.Clear();
                 SelectedDate = selectedDate;
-            }
-            else if (SelectedDates.Count == 1)
-            {
-                if (SelectedDates[0] != selectedDate)
-                {
-                    SelectedDates.Add(selectedDate);
-                    SelectedDates = SelectedDates.OrderBy(d => d).ToList();
-                    SelectedDate = null; 
-                    DateRangeSelected?.Invoke(this, (SelectedDates[0], SelectedDates[1]));
-                }
-                else
-                {
-                    SelectedDates.Clear();
-                    SelectedDates.Add(selectedDate);
-                    SelectedDate = selectedDate;
-                }
             }
             else
             {
-                SelectedDates.Clear();
                 SelectedDates.Add(selectedDate);
-                SelectedDate = selectedDate;
+                if (SelectedDates.Count > 1)
+                {
+                    SelectedDates = SelectedDates.OrderBy(d => d).ToList();
+                    DateRangeSelected?.Invoke(this, (SelectedDates[0], SelectedDates[1]));
+                }
             }
 
-            // Обновляем DaysGridView
+            SelectedDate = SelectedDates.Count == 1 ? SelectedDates[0] : (DateTime?)null;
+
             _daysGridView.SelectedDates = SelectedDates;
-            _daysGridView.WidthRequest = _mainGrid.Width;
-            _daysGridView.HeightRequest = _mainGrid.Height;
-            _daysGridView.BuildDaysGrid();
+            _daysGridView.BuildGrid();
         }
 
         private async void UpdateCalendar()
@@ -307,7 +272,7 @@ namespace Custom.MAUI.Calendar
             _daysGridView.ViewMode = _currentViewMode;
             _daysGridView.MinDate = MinDate;
             _daysGridView.MaxDate = MaxDate;
-            _daysGridView.BuildDaysGrid();
+            _daysGridView.BuildGrid();
             await _daysGridView.FadeTo(1, 200);
         }
 
