@@ -28,7 +28,6 @@ namespace Custom.MAUI.Calendar
         private DaysGridView _daysGridView;
 
         private Grid _mainGrid;
-        private ContentView _overlayView;
 
         private CalendarViewMode _currentViewMode = CalendarViewMode.Days;
 
@@ -206,26 +205,6 @@ namespace Custom.MAUI.Calendar
             UpdateCalendar();
         }
 
-        private void ShowMonthPicker()
-        {
-            var monthPicker = new MonthPickerView { Culture = Culture };
-            monthPicker.MonthSelected += OnMonthSelected;
-
-            ShowOverlay(monthPicker);
-        }
-
-        private void ShowYearPicker()
-        {
-            var yearPicker = new YearPickerView
-            {
-                StartYear = MinDate.Year,
-                EndYear = MaxDate.Year
-            };
-            yearPicker.YearSelected += OnYearSelected;
-
-            ShowOverlay(yearPicker);
-        }
-
         private void OnMonthSelected(object sender, int month)
         {
             _currentDate = new DateTime(_currentDate.Year, month, 1);
@@ -274,30 +253,6 @@ namespace Custom.MAUI.Calendar
             _daysGridView.MaxDate = MaxDate;
             _daysGridView.BuildGrid();
             await _daysGridView.FadeTo(1, 200);
-        }
-
-        private void ShowOverlay(View overlayContent)
-        {
-            _overlayView = new ContentView
-            {
-                BackgroundColor = new Color(0, 0, 0, (float)0.5),
-                Content = overlayContent
-            };
-            _overlayView.GestureRecognizers.Add(new TapGestureRecognizer
-            {
-                Command = new Command(HideOverlay)
-            });
-
-            _mainGrid.Children.Add(_overlayView);
-        }
-
-        private void HideOverlay()
-        {
-            if (_overlayView != null && _mainGrid.Children.Contains(_overlayView))
-            {
-                _mainGrid.Children.Remove(_overlayView);
-                _overlayView = null;
-            }
         }
     }
 }
