@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Custom.MAUI.Calendar.Views
 {
-    public class DaysGridView : Grid
+    public class DaysGridView : Grid, IDisposable
     {
         public event EventHandler<int> MonthSelected;
         public event EventHandler<int> YearSelected;
@@ -355,6 +355,11 @@ namespace Custom.MAUI.Calendar.Views
                 Grid.SetRow(dayLabel, 0);
                 Children.Add(dayLabel);
             }
+        }
+
+        public void Dispose()
+        {
+            Children.Clear();
         }
     }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Custom.MAUI.Calendar.Views
 {
-    public class HeaderView : ContentView
+    public class HeaderView : ContentView, IDisposable
     {
         public event EventHandler PreviousMonthClicked;
         public event EventHandler NextMonthClicked;
@@ -233,6 +233,14 @@ namespace Custom.MAUI.Calendar.Views
         private void OnMonthYearLabelTapped(object sender, EventArgs e)
         {
             MonthYearLabelTapped?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void Dispose()
+        {
+            // Отсоединяем жесты от меток
+            _monthLabel.GestureRecognizers.Clear();
+            _yearLabel.GestureRecognizers.Clear();
+            _monthYearLabel.GestureRecognizers.Clear();
         }
     }
 

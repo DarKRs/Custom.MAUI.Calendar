@@ -22,7 +22,7 @@ namespace Custom.MAUI.Calendar
         Years
     }
 
-    public class CustomCalendar : ContentView
+    public class CustomCalendar : ContentView, IDisposable
     {
         private HeaderView _headerView;
         private DaysGridView _daysGridView;
@@ -263,6 +263,26 @@ namespace Custom.MAUI.Calendar
             _daysGridView.ViewMode = _currentViewMode;
             _daysGridView.BuildGrid();
             await _daysGridView.FadeTo(1, 200);
+        }
+
+
+        public void Dispose()
+        {
+            // Отсоединяем обработчики событий
+            _headerView.PreviousMonthClicked -= OnPreviousMonthClicked;
+            _headerView.NextMonthClicked -= OnNextMonthClicked;
+            _headerView.PreviousYearClicked -= OnPreviousYearClicked;
+            _headerView.NextYearClicked -= OnNextYearClicked;
+            _headerView.MonthLabelTapped -= OnMonthLabelTapped;
+            _headerView.YearLabelTapped -= OnYearLabelTapped;
+            _headerView.MonthYearLabelTapped -= OnMonthYearLabelTapped;
+
+            _daysGridView.DaySelected -= OnDaySelected;
+            _daysGridView.MonthSelected -= OnMonthSelected;
+            _daysGridView.YearSelected -= OnYearSelected;
+
+            _headerView.Dispose();
+            _daysGridView.Dispose();
         }
     }
 
