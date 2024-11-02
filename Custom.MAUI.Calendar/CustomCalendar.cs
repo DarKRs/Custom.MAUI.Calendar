@@ -29,33 +29,14 @@ namespace Custom.MAUI.Calendar
 
         private CalendarViewMode _currentViewMode = CalendarViewMode.Days;
         private DateTime _currentDate;
+        public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
+        public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
 
-        public static readonly BindableProperty SelectedDateProperty =
-            BindableProperty.Create(nameof(SelectedDate), typeof(DateTime?), typeof(CustomCalendar), null, BindingMode.TwoWay);
+        private DateTime? _selectedDate;
+        private List<DateTime> _selectedDates = new List<DateTime>();
 
-        public DateTime? SelectedDate
-        {
-            get => (DateTime?)GetValue(SelectedDateProperty);
-            set => SetValue(SelectedDateProperty, value);
-        }
-
-        public static readonly BindableProperty SelectedDatesProperty =
-            BindableProperty.Create(nameof(SelectedDates), typeof(List<DateTime>), typeof(CustomCalendar), new List<DateTime>(), BindingMode.TwoWay);
-
-        public List<DateTime> SelectedDates
-        {
-            get => (List<DateTime>)GetValue(SelectedDatesProperty);
-            set => SetValue(SelectedDatesProperty, value);
-        }
-
-        public static readonly BindableProperty CalendarBackgroundColorProperty =
-            BindableProperty.Create(nameof(CalendarBackgroundColor), typeof(Color), typeof(CustomCalendar), Colors.White, propertyChanged: OnCalendarBackgroundColorChanged);
-
-        public Color CalendarBackgroundColor
-        {
-            get => (Color)GetValue(CalendarBackgroundColorProperty);
-            set => SetValue(CalendarBackgroundColorProperty, value);
-        }
+        public event EventHandler<DateTime> DateSelected;
+        public event EventHandler<(DateTime, DateTime)> DateRangeSelected;
 
         public static readonly BindableProperty DisplayModeProperty =
             BindableProperty.Create(nameof(DisplayMode), typeof(CalendarDisplayMode), typeof(CustomCalendar), CalendarDisplayMode.Default, propertyChanged: OnDisplayModeChanged);
@@ -84,12 +65,6 @@ namespace Custom.MAUI.Calendar
             set => SetValue(StyleProperty, value);
         }
 
-        public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
-        public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
-
-        public event EventHandler<DateTime> DateSelected;
-        public event EventHandler<(DateTime, DateTime)> DateRangeSelected;
-
         public CustomCalendar()
         {
             _currentDate = DateTime.Today;
@@ -112,7 +87,7 @@ namespace Custom.MAUI.Calendar
             _daysGridView = new DaysGridView
             {
                 CurrentDate = _currentDate,
-                SelectedDates = SelectedDates,
+                SelectedDates = _selectedDates,
                 Culture = Culture,
                 Style = Style,
                 MinDate = MinDate,
@@ -124,22 +99,11 @@ namespace Custom.MAUI.Calendar
 
             var mainLayout = new StackLayout
             {
-                BackgroundColor = CalendarBackgroundColor,
+                BackgroundColor = Style?.BackgroundColor,
                 Children = { _headerView, _daysGridView }
             };
 
             Content = mainLayout;
-        }
-
-        private static void OnCalendarBackgroundColorChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is CustomCalendar calendar)
-            {
-                if (calendar.Content is Layout contentLayout)
-                {
-                    contentLayout.BackgroundColor = calendar.CalendarBackgroundColor;
-                }
-            }
         }
 
         private static void OnDisplayModeChanged(BindableObject bindable, object oldValue, object newValue)
@@ -230,28 +194,28 @@ namespace Custom.MAUI.Calendar
 
         private void UpdateSelectedDates(DateTime selectedDate)
         {
-            if (SelectedDates.Contains(selectedDate))
+            if (_selectedDates.Contains(selectedDate))
             {
-                SelectedDates.Clear();
+                _selectedDates.Clear();
             }
             else
             {
-                SelectedDates.Add(selectedDate);
-                if (SelectedDates.Count > 2)
+                _selectedDates.Add(selectedDate);
+                if (_selectedDates.Count > 2)
                 {
-                    SelectedDates.RemoveAt(0);
+                    _selectedDates.RemoveAt(0);
                 }
 
-                if (SelectedDates.Count == 2)
+                if (_selectedDates.Count == 2)
                 {
-                    SelectedDates = SelectedDates.OrderBy(d => d).ToList();
-                    DateRangeSelected?.Invoke(this, (SelectedDates[0], SelectedDates[1]));
+                    _selectedDates = _selectedDates.OrderBy(d => d).ToList();
+                    DateRangeSelected?.Invoke(this, (_selectedDates[0], _selectedDates[1]));
                 }
             }
 
-            SelectedDate = SelectedDates.Count == 1 ? SelectedDates[0] : (DateTime?)null;
+            _selectedDate = _selectedDates.Count == 1 ? _selectedDates[0] : (DateTime?)null;
 
-            _daysGridView.SelectedDates = SelectedDates;
+            _daysGridView.SelectedDates = _selectedDates;
             _daysGridView.BuildGrid();
         }
 

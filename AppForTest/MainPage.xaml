@@ -11,12 +11,20 @@
             Spacing="25">
 
             <controls:CustomCalendar x:Name="Calendar"
-                      SelectedDate="{Binding SelectedDate}"  
-                      CalendarBackgroundColor="LightGrey"
-                      DisplayMode="SeparateMonthYear"
-                      MinDate="2000-01-01"
-                      MaxDate="2100-12-31" />
-            <Image
+                      DisplayMode="SeparateMonthYear">
+                <controls:CustomCalendar.Style>
+                    <controls:CalendarStyle BackgroundColor="LightYellow"
+                                    TodayBackgroundColor="LightBlue"
+                                    SelectedDateBackgroundColor="LightGreen"
+                                    DateRangeBackgroundColor="LightCoral"
+                                    NavigationButtonBackgroundColor="Gray"
+                                    NavigationButtonTextColor="White"
+                                    LabelTextColor="Black"
+                                    LabelFontSize="18"
+                                    DayButtonFontSize="14" />
+                </controls:CustomCalendar.Style>
+            </controls:CustomCalendar>
+                    <Image
                 Source="dotnet_bot.png"
                 HeightRequest="185"
                 Aspect="AspectFit"

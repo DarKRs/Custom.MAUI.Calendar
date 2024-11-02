@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Custom.MAUI.Calendar.Views
 {
-    public class HeaderView : ContentView, IDisposable
+    internal class HeaderView : ContentView, IDisposable
     {
         public event EventHandler PreviousMonthClicked;
         public event EventHandler NextMonthClicked;
@@ -25,31 +25,47 @@ namespace Custom.MAUI.Calendar.Views
         private Button _previousYearButton;
         private Button _nextYearButton;
 
-        public static readonly BindableProperty DisplayModeProperty =
-            BindableProperty.Create(nameof(DisplayMode), typeof(CalendarDisplayMode), typeof(HeaderView), CalendarDisplayMode.Default, propertyChanged: OnDisplayModeChanged);
-
+        private CalendarDisplayMode _displayMode = CalendarDisplayMode.Default;
         public CalendarDisplayMode DisplayMode
         {
-            get => (CalendarDisplayMode)GetValue(DisplayModeProperty);
-            set => SetValue(DisplayModeProperty, value);
+            get => _displayMode;
+            set
+            {
+                if (_displayMode != value)
+                {
+                    _displayMode = value;
+                    InitializeHeader();
+                    UpdateLabels();
+                }
+            }
         }
 
-        public static readonly BindableProperty CurrentDateProperty =
-            BindableProperty.Create(nameof(CurrentDate), typeof(DateTime), typeof(HeaderView), DateTime.Today, propertyChanged: OnCurrentDateChanged);
-
+        private DateTime _currentDate = DateTime.Today;
         public DateTime CurrentDate
         {
-            get => (DateTime)GetValue(CurrentDateProperty);
-            set => SetValue(CurrentDateProperty, value);
+            get => _currentDate;
+            set
+            {
+                if (_currentDate != value)
+                {
+                    _currentDate = value;
+                    UpdateLabels();
+                }
+            }
         }
 
-        public static readonly BindableProperty CultureProperty =
-            BindableProperty.Create(nameof(Culture), typeof(CultureInfo), typeof(HeaderView), CultureInfo.CurrentCulture, propertyChanged: OnCultureChanged);
-
+        private CultureInfo _culture = CultureInfo.CurrentCulture;
         public CultureInfo Culture
         {
-            get => (CultureInfo)GetValue(CultureProperty);
-            set => SetValue(CultureProperty, value);
+            get => _culture;
+            set
+            {
+                if (_culture != value)
+                {
+                    _culture = value;
+                    UpdateLabels();
+                }
+            }
         }
 
         public CalendarStyle Style { get; set; }
@@ -57,31 +73,6 @@ namespace Custom.MAUI.Calendar.Views
         public HeaderView()
         {
             InitializeHeader();
-        }
-
-        private static void OnDisplayModeChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is HeaderView headerView)
-            {
-                headerView.InitializeHeader();
-                headerView.UpdateLabels();
-            }
-        }
-
-        private static void OnCurrentDateChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is HeaderView headerView)
-            {
-                headerView.UpdateLabels();
-            }
-        }
-
-        private static void OnCultureChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is HeaderView headerView)
-            {
-                headerView.UpdateLabels();
-            }
         }
 
         private void InitializeHeader()
@@ -97,7 +88,7 @@ namespace Custom.MAUI.Calendar.Views
             _previousYearButton = CreateNavigationButton("<", (s, e) => PreviousYearClicked?.Invoke(this, EventArgs.Empty));
             _nextYearButton = CreateNavigationButton(">", (s, e) => NextYearClicked?.Invoke(this, EventArgs.Empty));
 
-            switch (DisplayMode)
+            switch (_displayMode)
             {
                 case CalendarDisplayMode.SeparateMonthYear:
                     ConfigureSeparateMonthYearLayout();
@@ -197,19 +188,19 @@ namespace Custom.MAUI.Calendar.Views
 
         private void UpdateLabels()
         {
-            if (Culture == null)
+            if (_culture == null)
             {
-                Culture = CultureInfo.CurrentCulture;
+                _culture = CultureInfo.CurrentCulture;
             }
 
-            if (DisplayMode == CalendarDisplayMode.SeparateMonthYear || DisplayMode == CalendarDisplayMode.SeparateMonthFixedYear)
+            if (_displayMode == CalendarDisplayMode.SeparateMonthYear || _displayMode == CalendarDisplayMode.SeparateMonthFixedYear)
             {
-                _monthLabel.Text = CurrentDate.ToString("MMMM", Culture);
-                _yearLabel.Text = CurrentDate.ToString("yyyy", Culture);
+                _monthLabel.Text = _currentDate.ToString("MMMM", _culture);
+                _yearLabel.Text = _currentDate.ToString("yyyy", _culture);
             }
             else
             {
-                _monthYearLabel.Text = CurrentDate.ToString("MMMM yyyy", Culture);
+                _monthYearLabel.Text = _currentDate.ToString("MMMM yyyy", _culture);
             }
         }
 

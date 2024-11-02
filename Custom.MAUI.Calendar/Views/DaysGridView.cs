@@ -7,96 +7,84 @@ using System.Threading.Tasks;
 
 namespace Custom.MAUI.Calendar.Views
 {
-    public class DaysGridView : Grid, IDisposable
+    internal class DaysGridView : Grid, IDisposable
     {
-        public event EventHandler<int> MonthSelected;
-        public event EventHandler<int> YearSelected;
-        public event EventHandler<DateTime> DaySelected;
-
-        public static readonly BindableProperty CurrentDateProperty =
-            BindableProperty.Create(nameof(CurrentDate), typeof(DateTime), typeof(DaysGridView), DateTime.Today, propertyChanged: OnCurrentDateChanged);
-
-        public DateTime CurrentDate
-        {
-            get => (DateTime)GetValue(CurrentDateProperty);
-            set => SetValue(CurrentDateProperty, value);
-        }
-
-        public static readonly BindableProperty SelectedDatesProperty =
-            BindableProperty.Create(nameof(SelectedDates), typeof(List<DateTime>), typeof(DaysGridView), new List<DateTime>(), propertyChanged: OnSelectedDatesChanged);
-
-        public List<DateTime> SelectedDates
-        {
-            get => (List<DateTime>)GetValue(SelectedDatesProperty);
-            set => SetValue(SelectedDatesProperty, value);
-        }
-
-        public static readonly BindableProperty CultureProperty =
-            BindableProperty.Create(nameof(Culture), typeof(CultureInfo), typeof(DaysGridView), CultureInfo.CurrentCulture, propertyChanged: OnCultureChanged);
-
-        public CultureInfo Culture
-        {
-            get => (CultureInfo)GetValue(CultureProperty);
-            set => SetValue(CultureProperty, value);
-        }
-
-        public static readonly BindableProperty ViewModeProperty =
-            BindableProperty.Create(nameof(ViewMode), typeof(CalendarViewMode), typeof(DaysGridView), CalendarViewMode.Days, propertyChanged: OnViewModeChanged);
-
-        public CalendarViewMode ViewMode
-        {
-            get => (CalendarViewMode)GetValue(ViewModeProperty);
-            set => SetValue(ViewModeProperty, value);
-        }
-
-        public CalendarStyle Style { get; set; }
-
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
 
         private int _currentYearPage = 0;
 
+        public event EventHandler<int> MonthSelected;
+        public event EventHandler<int> YearSelected;
+        public event EventHandler<DateTime> DaySelected;
+
+        private DateTime _currentDate = DateTime.Today;
+        public DateTime CurrentDate
+        {
+            get => _currentDate;
+            set
+            {
+                if (_currentDate != value)
+                {
+                    _currentDate = value;
+                    BuildGrid();
+                }
+            }
+        }
+
+        private List<DateTime> _selectedDates = new List<DateTime>();
+        public List<DateTime> SelectedDates
+        {
+            get => _selectedDates;
+            set
+            {
+                if (_selectedDates != value)
+                {
+                    _selectedDates = value;
+                    BuildGrid();
+                }
+            }
+        }
+
+        private CultureInfo _culture = CultureInfo.CurrentCulture;
+        public CultureInfo Culture
+        {
+            get => _culture;
+            set
+            {
+                if (_culture != value)
+                {
+                    _culture = value;
+                    BuildGrid();
+                }
+            }
+        }
+
+        private CalendarViewMode _viewMode = CalendarViewMode.Days;
+        public CalendarViewMode ViewMode
+        {
+            get => _viewMode;
+            set
+            {
+                if (_viewMode != value)
+                {
+                    _viewMode = value;
+                    BuildGrid();
+                }
+            }
+        }
+
+        public CalendarStyle Style { get; set; }
+
         public DaysGridView()
         {
-            _currentYearPage = (CurrentDate.Year - MinDate.Year) / 12; 
+            _currentYearPage = (_currentDate.Year - MinDate.Year) / 12; 
             BuildGrid();
-        }
-
-        private static void OnCurrentDateChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is DaysGridView daysGrid)
-            {
-                daysGrid.BuildGrid();
-            }
-        }
-
-        private static void OnSelectedDatesChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is DaysGridView daysGrid)
-            {
-                daysGrid.BuildGrid();
-            }
-        }
-
-        private static void OnCultureChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is DaysGridView daysGrid)
-            {
-                daysGrid.BuildGrid();
-            }
-        }
-
-        private static void OnViewModeChanged(BindableObject bindable, object oldValue, object newValue)
-        {
-            if (bindable is DaysGridView daysGrid)
-            {
-                daysGrid.BuildGrid();
-            }
         }
 
         public void BuildGrid()
         {
-            switch (ViewMode)
+            switch (_viewMode)
             {
                 case CalendarViewMode.Days:
                     BuildDaysView();
@@ -133,10 +121,10 @@ namespace Custom.MAUI.Calendar.Views
             VerticalOptions = LayoutOptions.Fill;
             HorizontalOptions = LayoutOptions.Fill;
 
-            var firstDayOfMonth = new DateTime(CurrentDate.Year, CurrentDate.Month, 1);
+            var firstDayOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
             int startDay = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
 
-            int daysInMonth = DateTime.DaysInMonth(CurrentDate.Year, CurrentDate.Month);
+            int daysInMonth = DateTime.DaysInMonth(_currentDate.Year, _currentDate.Month);
 
             int row = 1;
             int column = startDay;
@@ -151,7 +139,7 @@ namespace Custom.MAUI.Calendar.Views
 
             for (int day = 1; day <= daysInMonth; day++)
             {
-                var currentDay = new DateTime(CurrentDate.Year, CurrentDate.Month, day);
+                var currentDay = new DateTime(_currentDate.Year, _currentDate.Month, day);
 
                 var dayButton = new Button
                 {
@@ -171,18 +159,18 @@ namespace Custom.MAUI.Calendar.Views
                 }
 
                 // Выделение выбранных дат
-                if (SelectedDates != null && SelectedDates.Count > 0)
+                if (_selectedDates != null && _selectedDates.Count > 0)
                 {
-                    if (SelectedDates.Count == 1)
+                    if (_selectedDates.Count == 1)
                     {
-                        if (currentDay.Date == SelectedDates[0].Date)
+                        if (currentDay.Date == _selectedDates[0].Date)
                         {
                             dayButton.BackgroundColor = Style?.SelectedDateBackgroundColor ?? Colors.LightGreen;
                         }
                     }
-                    else if (SelectedDates.Count == 2)
+                    else if (_selectedDates.Count == 2)
                     {
-                        if (currentDay.Date >= SelectedDates[0].Date && currentDay.Date <= SelectedDates[1].Date)
+                        if (currentDay.Date >= _selectedDates[0].Date && currentDay.Date <= _selectedDates[1].Date)
                         {
                             dayButton.BackgroundColor = Style?.DateRangeBackgroundColor ?? Colors.LightGreen;
                         }
@@ -208,7 +196,7 @@ namespace Custom.MAUI.Calendar.Views
             int rows = 4;
             BuildBaseGrid(rows, columns);
 
-            var months = Culture.DateTimeFormat.MonthNames.Take(12).ToArray();
+            var months = _culture.DateTimeFormat.MonthNames.Take(12).ToArray();
 
             int index = 0;
             for (int row = 0; row < rows; row++)
@@ -337,8 +325,8 @@ namespace Custom.MAUI.Calendar.Views
 
         private void AddDaysOfWeekLabels()
         {
-            var firstDayOfWeek = Culture.DateTimeFormat.FirstDayOfWeek;
-            var dayNames = Culture.DateTimeFormat.AbbreviatedDayNames;
+            var firstDayOfWeek = _culture.DateTimeFormat.FirstDayOfWeek;
+            var dayNames = _culture.DateTimeFormat.AbbreviatedDayNames;
 
             for (int i = 0; i < 7; i++)
             {
