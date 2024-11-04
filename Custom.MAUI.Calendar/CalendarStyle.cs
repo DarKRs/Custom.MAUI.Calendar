@@ -8,19 +8,31 @@ namespace Custom.MAUI.Calendar
 {
     public class CalendarStyle
     {
-        public Color BackgroundColor { get; set; } = Colors.White;
-        public Color TodayBackgroundColor { get; set; } = Colors.LightBlue;
-        public Color SelectedDateBackgroundColor { get; set; } = Colors.LightGreen;
-        public Color DateRangeBackgroundColor { get; set; } = Colors.LightGreen;
-        public Color NavigationButtonBackgroundColor { get; set; } = Colors.LightGray;
-        public Color NavigationButtonTextColor { get; set; } = Colors.Black;
-        public Color LabelTextColor { get; set; } = Colors.Black;
-        public double LabelFontSize { get; set; } = 18;
-        public double DayButtonFontSize { get; set; } = 14;
-        public Thickness DayButtonPadding { get; set; } = new Thickness(5);
-        public Thickness NavigationButtonPadding { get; set; } = new Thickness(5);
-        public double NavigationButtonSize { get; set; } = 40;
-        public double NavigationButtonCornerRadius { get; set; } = 20;
+        // **Общие настройки**
+        public Color BackgroundColor { get; set; } = Colors.White; // Фон всего календаря
+
+        // **Настройки дней**
+        public Color DayTextColor { get; set; } = Colors.Black; // Цвет текста дней
+        public double DayFontSize { get; set; } = 14; // Размер шрифта дней
+        public Thickness DayButtonPadding { get; set; } = new Thickness(5); // Отступы кнопок дней
+        public Color TodayBackgroundColor { get; set; } = Colors.LightBlue; // Фон сегодняшнего дня
+        public Color SelectedDateBackgroundColor { get; set; } = Colors.LightGreen; // Фон выбранной даты
+        public Color DateRangeBackgroundColor { get; set; } = Colors.LightGreen; // Фон диапазона дат
+
+        // **Настройки навигационных кнопок**
+        public Color NavigationButtonBackgroundColor { get; set; } = Colors.LightGray; // Фон кнопок навигации
+        public Color NavigationButtonTextColor { get; set; } = Colors.Black; // Цвет текста кнопок навигации
+        public double NavigationButtonSize { get; set; } = 40; // Размер кнопок навигации
+        public double NavigationButtonCornerRadius { get; set; } = 20; // Радиус скругления кнопок навигации
+        public Thickness NavigationButtonPadding { get; set; } = new Thickness(5); // Отступы кнопок навигации
+
+        // **Настройки заголовков и меток**
+        public Color LabelTextColor { get; set; } = Colors.Black; // Цвет текста меток (месяц, год, дни недели)
+        public double LabelFontSize { get; set; } = 18; // Размер шрифта меток
+
+        // **Настройки дней недели**
+        public Color DayOfWeekLabelTextColor { get; set; } = Colors.Black; // Цвет текста названий дней недели
+        public double DayOfWeekLabelFontSize { get; set; } = 14; // Размер шрифта названий дней недели
 
     }
 }

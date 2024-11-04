@@ -154,12 +154,12 @@ namespace Custom.MAUI.Calendar.Views
             var button = new Button
             {
                 Text = text,
-                WidthRequest = 40,
-                HeightRequest = 40,
-                Padding = new Thickness(5),
+                WidthRequest = Style?.NavigationButtonSize ?? 40,
+                HeightRequest = Style?.NavigationButtonSize ?? 40,
+                Padding = Style?.NavigationButtonPadding ?? new Thickness(5),
                 BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
                 TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
-                CornerRadius = 20
+                CornerRadius = (int)(Style?.NavigationButtonCornerRadius ?? 20)
             };
             button.Clicked += clickedHandler;
             return button;

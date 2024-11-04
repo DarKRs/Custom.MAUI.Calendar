@@ -146,8 +146,8 @@ namespace Custom.MAUI.Calendar.Views
                     Text = day.ToString(),
                     BindingContext = currentDay,
                     BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
-                    TextColor = Style?.LabelTextColor ?? Colors.Black,
-                    FontSize = Style?.DayButtonFontSize ?? Device.GetNamedSize(NamedSize.Default, typeof(Button)),
+                    TextColor = Style?.DayTextColor ?? Colors.Black,
+                    FontSize = Style?.DayFontSize ?? 14,
                     Padding = Style?.DayButtonPadding ?? new Thickness(5),
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.FillAndExpand
@@ -215,7 +215,7 @@ namespace Custom.MAUI.Calendar.Views
                         CommandParameter = index + 1,
                         BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = Style?.DayButtonFontSize ?? 14
+                        FontSize = Style?.DayFontSize ?? 14
                     };
                     monthButton.Clicked += (s, e) =>
                     {
@@ -261,7 +261,7 @@ namespace Custom.MAUI.Calendar.Views
                         CommandParameter = year,
                         BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = Style?.DayButtonFontSize ?? 14
+                        FontSize = Style?.DayFontSize ?? 14
                     };
                     yearButton.Clicked += (s, e) =>
                     {
@@ -340,7 +340,8 @@ namespace Custom.MAUI.Calendar.Views
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     FontAttributes = FontAttributes.Bold,
-                    TextColor = Style?.LabelTextColor ?? Colors.Black,
+                    TextColor = Style?.DayOfWeekLabelTextColor ?? Colors.Black,
+                    FontSize = Style?.DayOfWeekLabelFontSize ?? 14
                 };
                 Grid.SetColumn(dayLabel, i);
                 Grid.SetRow(dayLabel, 0);
