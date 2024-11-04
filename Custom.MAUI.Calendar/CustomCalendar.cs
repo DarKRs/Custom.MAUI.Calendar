@@ -37,6 +37,13 @@ namespace Custom.MAUI.Calendar
 
         public event EventHandler<DateTime> DateSelected;
         public event EventHandler<(DateTime, DateTime)> DateRangeSelected;
+        public event EventHandler<DateTime> MonthChanged;
+        public event EventHandler<DateTime> YearChanged;
+        public event EventHandler<CalendarDisplayMode> ViewModeChanged;
+        public event EventHandler<DateTime> DateDeselected;
+        public event EventHandler DateRangeCleared;
+        public event EventHandler<CultureInfo> CultureChanged;
+        public event EventHandler<CalendarStyle> StyleChanged;
 
         public static readonly BindableProperty DisplayModeProperty =
             BindableProperty.Create(nameof(DisplayMode), typeof(CalendarDisplayMode), typeof(CustomCalendar), CalendarDisplayMode.Default, propertyChanged: OnDisplayModeChanged);
@@ -112,6 +119,7 @@ namespace Custom.MAUI.Calendar
             {
                 calendar._headerView.DisplayMode = calendar.DisplayMode;
                 calendar.UpdateCalendar();
+                calendar.ViewModeChanged?.Invoke(calendar, calendar._headerView.DisplayMode);
             }
         }
 
@@ -122,6 +130,7 @@ namespace Custom.MAUI.Calendar
                 calendar._headerView.Culture = calendar.Culture;
                 calendar._daysGridView.Culture = calendar.Culture;
                 calendar.UpdateCalendar();
+                calendar.CultureChanged?.Invoke(calendar, calendar.Culture);
             }
         }
 
@@ -130,6 +139,7 @@ namespace Custom.MAUI.Calendar
             if (bindable is CustomCalendar calendar)
             {
                 calendar.ApplyStyles();
+                calendar.StyleChanged?.Invoke(calendar, calendar.Style);
             }
         }
 
@@ -151,6 +161,15 @@ namespace Custom.MAUI.Calendar
             {
                 _currentDate = newDate;
                 UpdateCalendar();
+                if (months != 0)
+                {
+                    MonthChanged?.Invoke(this, _currentDate);
+                }
+
+                if (years != 0)
+                {
+                    YearChanged?.Invoke(this, _currentDate);
+                }
             }
         }
 
@@ -197,6 +216,13 @@ namespace Custom.MAUI.Calendar
             if (_selectedDates.Contains(selectedDate))
             {
                 _selectedDates.Clear();
+
+                DateDeselected?.Invoke(this, selectedDate);
+
+                if (_selectedDates.Count == 0)
+                {
+                    DateRangeCleared?.Invoke(this, EventArgs.Empty);
+                }
             }
             else
             {
