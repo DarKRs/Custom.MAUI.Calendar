@@ -11,7 +11,9 @@
             Spacing="25">
 
             <controls:CustomCalendar x:Name="Calendar"
-                      DisplayMode="SeparateMonthYear">
+                      DisplayMode="SeparateMonthYear"
+                      DateSelected="OnDateSelected"
+                      DateRangeSelected="OnDateRangeSelected">
                 <controls:CustomCalendar.Style>
                     <controls:CalendarStyle BackgroundColor="LightYellow"
                                     TodayBackgroundColor="LightBlue"
@@ -27,18 +29,14 @@
                                     NavigationButtonCornerRadius="25"/>
                 </controls:CustomCalendar.Style>
             </controls:CustomCalendar>
-                    <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a race car number eight" />
 
-            <Label
+
+            <Label x:Name="SelectedDateLabel"
                 Text="Hello, World!"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
 
-            <Label
+            <Label x:Name="DateRangeLabel"
                 Text="Welcome to &#10;.NET Multi-platform App UI"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
