@@ -17,6 +17,10 @@ namespace Custom.MAUI.Calendar
         public Color LabelTextColor { get; set; } = Colors.Black;
         public double LabelFontSize { get; set; } = 18;
         public double DayButtonFontSize { get; set; } = 14;
+        public Thickness DayButtonPadding { get; set; } = new Thickness(5);
+        public Thickness NavigationButtonPadding { get; set; } = new Thickness(5);
+        public double NavigationButtonSize { get; set; } = 40;
+        public double NavigationButtonCornerRadius { get; set; } = 20;
 
     }
 }

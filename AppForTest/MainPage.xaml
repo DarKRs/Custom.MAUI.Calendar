@@ -21,7 +21,10 @@
                                     NavigationButtonTextColor="White"
                                     LabelTextColor="Black"
                                     LabelFontSize="18"
-                                    DayButtonFontSize="14" />
+                                    DayButtonFontSize="14"
+                                    DayButtonPadding="10"
+                                    NavigationButtonSize="50"
+                                    NavigationButtonCornerRadius="25"/>
                 </controls:CustomCalendar.Style>
             </controls:CustomCalendar>
                     <Image
