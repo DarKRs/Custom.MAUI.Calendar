@@ -72,7 +72,7 @@ public MainPage()
 }
 ```
 
-###Настройка стиля
+### Настройка стиля
 
 ```xaml
             <controls:CustomCalendar x:Name="Calendar">
