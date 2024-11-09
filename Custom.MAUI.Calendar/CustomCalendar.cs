@@ -8,6 +8,18 @@ using System.Linq;
 
 namespace Custom.MAUI.Calendar
 {
+    public class DayTappedEventArgs : EventArgs
+    {
+        public DateTime Date { get; set; }
+        public VisualElement VisualElement { get; set; }
+    }
+    public class DateRangeTappedEventArgs : EventArgs
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public List<VisualElement> VisualElements { get; set; }
+    }
+
     public enum CalendarDisplayMode
     {
         Default,
@@ -35,8 +47,8 @@ namespace Custom.MAUI.Calendar
         private DateTime? _selectedDate;
         private List<DateTime> _selectedDates = new List<DateTime>();
 
-        public event EventHandler<DateTime> DateSelected;
-        public event EventHandler<(DateTime, DateTime)> DateRangeSelected;
+        public event EventHandler<DayTappedEventArgs> DateSelected;
+        public event EventHandler<DateRangeTappedEventArgs> DateRangeSelected;
         public event EventHandler<DateTime> MonthChanged;
         public event EventHandler<DateTime> YearChanged;
         public event EventHandler<CalendarDisplayMode> ViewModeChanged;
@@ -173,10 +185,10 @@ namespace Custom.MAUI.Calendar
             }
         }
 
-        private void OnDaySelected(object sender, DateTime selectedDate)
+        private void OnDaySelected(object sender, DayTappedEventArgs e)
         {
-            UpdateSelectedDates(selectedDate);
-            DateSelected?.Invoke(this, selectedDate);
+            UpdateSelectedDates(e.Date);
+            DateSelected?.Invoke(this, e);
         }
 
         private void OnMonthLabelTapped(object sender, EventArgs e)
@@ -235,7 +247,28 @@ namespace Custom.MAUI.Calendar
                 if (_selectedDates.Count == 2)
                 {
                     _selectedDates = _selectedDates.OrderBy(d => d).ToList();
-                    DateRangeSelected?.Invoke(this, (_selectedDates[0], _selectedDates[1]));
+
+                    var datesInRange = GetDatesInRange(_selectedDates[0], _selectedDates[1]);
+
+                    // Собираем соответствующие VisualElement
+                    var visualElements = new List<VisualElement>();
+                    foreach (var date in datesInRange)
+                    {
+                        if (_daysGridView.TryGetDayButton(date, out var button))
+                        {
+                            visualElements.Add(button);
+                        }
+                    }
+
+                    // Создаем аргументы события
+                    var eventArgs = new DateRangeTappedEventArgs
+                    {
+                        StartDate = _selectedDates[0],
+                        EndDate = _selectedDates[1],
+                        VisualElements = visualElements
+                    };
+
+                    DateRangeSelected?.Invoke(this, eventArgs);
                 }
             }
 
@@ -253,6 +286,14 @@ namespace Custom.MAUI.Calendar
             _daysGridView.ViewMode = _currentViewMode;
             _daysGridView.BuildGrid();
             await _daysGridView.FadeTo(1, 200);
+        }
+
+        private IEnumerable<DateTime> GetDatesInRange(DateTime start, DateTime end)
+        {
+            for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+            {
+                yield return date;
+            }
         }
 
 

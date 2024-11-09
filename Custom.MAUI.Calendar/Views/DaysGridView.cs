@@ -13,10 +13,11 @@ namespace Custom.MAUI.Calendar.Views
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
 
         private int _currentYearPage = 0;
+        private Dictionary<DateTime, Button> _dayButtons = new Dictionary<DateTime, Button>();
 
         public event EventHandler<int> MonthSelected;
         public event EventHandler<int> YearSelected;
-        public event EventHandler<DateTime> DaySelected;
+        public event EventHandler<DayTappedEventArgs> DaySelected;
 
         private DateTime _currentDate = DateTime.Today;
         public DateTime CurrentDate
@@ -153,7 +154,17 @@ namespace Custom.MAUI.Calendar.Views
                     VerticalOptions = LayoutOptions.FillAndExpand
                 };
 
-                dayButton.Clicked += (s, e) => DaySelected?.Invoke(this, currentDay);
+                dayButton.Clicked += (s, e) =>
+                {
+                    var button = s as VisualElement;
+                    DaySelected?.Invoke(this, new DayTappedEventArgs
+                    {
+                        Date = currentDay,
+                        VisualElement = button
+                    });
+                };
+
+                _dayButtons[currentDay.Date] = dayButton;
 
                 // Выделение сегодняшнего дня
                 if (currentDay.Date == DateTime.Today)
@@ -347,6 +358,11 @@ namespace Custom.MAUI.Calendar.Views
                 Grid.SetRow(dayLabel, 0);
                 Children.Add(dayLabel);
             }
+        }
+
+        public bool TryGetDayButton(DateTime date, out Button button)
+        {
+            return _dayButtons.TryGetValue(date.Date, out button);
         }
 
         public void Dispose()

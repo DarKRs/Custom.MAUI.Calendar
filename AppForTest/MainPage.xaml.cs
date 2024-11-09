@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Custom.MAUI.Calendar;
+using System.Globalization;
 
 namespace AppForTest
 {
@@ -14,16 +15,16 @@ namespace AppForTest
             Calendar.DateRangeSelected += OnDateRangeSelected;
         }
 
-        private void OnDateSelected(object sender, DateTime selectedDate)
+        private void OnDateSelected(object sender, DayTappedEventArgs selectedDate)
         {
             // Обновляем Label с выбранной датой
             SelectedDateLabel.Text = $"Вы выбрали дату: {selectedDate:d}";
         }
 
-        private void OnDateRangeSelected(object sender, (DateTime, DateTime) dateRange)
+        private void OnDateRangeSelected(object sender, DateRangeTappedEventArgs dateRange)
         {
             // Обновляем Label с выбранным диапазоном дат
-            DateRangeLabel.Text = $"Вы выбрали диапазон: {dateRange.Item1:d} - {dateRange.Item2:d}";
+            DateRangeLabel.Text = $"Вы выбрали диапазон: {dateRange.StartDate} - {dateRange.EndDate}";
         }
 
         private void OnCounterClicked(object sender, EventArgs e)
