@@ -11,9 +11,7 @@
             Spacing="25">
 
             <controls:CustomCalendar x:Name="Calendar"
-                      DisplayMode="SeparateMonthYear"
-                      DateSelected="OnDateSelected"
-                      DateRangeSelected="OnDateRangeSelected">
+                      DisplayMode="SeparateMonthYear">
                 <controls:CustomCalendar.Style>
                     <controls:CalendarStyle BackgroundColor="LightYellow"
                                     TodayBackgroundColor="LightBlue"
@@ -23,7 +21,6 @@
                                     NavigationButtonTextColor="White"
                                     LabelTextColor="Black"
                                     LabelFontSize="18"
-                                    DayButtonFontSize="14"
                                     DayButtonPadding="10"
                                     NavigationButtonSize="50"
                                     NavigationButtonCornerRadius="25"/>

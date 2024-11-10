@@ -18,7 +18,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.21</Version>
     <PackageId>Custom.MAUI.Calendar</PackageId>
     <Authors>DarKRs</Authors>
     <Description>Настраиваемый компонент календаря для .NET MAUI</Description>

@@ -114,6 +114,7 @@ namespace Custom.MAUI.Calendar.Views
 
         private void BuildDaysView()
         {
+            _dayButtons.Clear();
             BuildBaseGrid(7, 7);
             AddDaysOfWeekLabels();
 

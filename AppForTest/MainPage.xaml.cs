@@ -1,4 +1,5 @@
 ﻿using Custom.MAUI.Calendar;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace AppForTest
@@ -12,17 +13,31 @@ namespace AppForTest
             InitializeComponent();
             //Calendar.Culture = CultureInfo.GetCultureInfo("fr-FR");
             Calendar.DateSelected += OnDateSelected;
+            Calendar.DateDeselected += Calendar_DateDeselected;
             Calendar.DateRangeSelected += OnDateRangeSelected;
+            Calendar.DateRangeCleared += Calendar_DateRangeCleared;
+        }
+
+        private void Calendar_DateRangeCleared(object? sender, EventArgs e)
+        {
+            Debug.WriteLine($"DateRangeCleard {e}");
+        }
+
+        private void Calendar_DateDeselected(object? sender, DateTime e)
+        {
+            Debug.WriteLine($"DateDeSelected {e}");
         }
 
         private void OnDateSelected(object sender, DayTappedEventArgs selectedDate)
         {
+            Debug.WriteLine($"DateSelected {selectedDate}");
             // Обновляем Label с выбранной датой
             SelectedDateLabel.Text = $"Вы выбрали дату: {selectedDate:d}";
         }
 
         private void OnDateRangeSelected(object sender, DateRangeTappedEventArgs dateRange)
         {
+            Debug.WriteLine($"DateRangeSelected {dateRange}");
             // Обновляем Label с выбранным диапазоном дат
             DateRangeLabel.Text = $"Вы выбрали диапазон: {dateRange.StartDate} - {dateRange.EndDate}";
         }

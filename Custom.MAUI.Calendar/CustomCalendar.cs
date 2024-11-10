@@ -188,7 +188,6 @@ namespace Custom.MAUI.Calendar
         private void OnDaySelected(object sender, DayTappedEventArgs e)
         {
             UpdateSelectedDates(e.Date);
-            DateSelected?.Invoke(this, e);
         }
 
         private void OnMonthLabelTapped(object sender, EventArgs e)
@@ -227,7 +226,7 @@ namespace Custom.MAUI.Calendar
         {
             if (_selectedDates.Contains(selectedDate))
             {
-                _selectedDates.Clear();
+                _selectedDates.Remove(selectedDate);
 
                 DateDeselected?.Invoke(this, selectedDate);
 
@@ -238,19 +237,22 @@ namespace Custom.MAUI.Calendar
             }
             else
             {
-                _selectedDates.Add(selectedDate);
-                if (_selectedDates.Count > 2)
+                // Если уже выбран диапазон (две даты), сбрасываем выбор.
+                if (_selectedDates.Count == 2)
                 {
-                    _selectedDates.RemoveAt(0);
+                    _selectedDates.Clear();
+                    DateRangeCleared?.Invoke(this, EventArgs.Empty);
                 }
+
+                _selectedDates.Add(selectedDate);
+
 
                 if (_selectedDates.Count == 2)
                 {
                     _selectedDates = _selectedDates.OrderBy(d => d).ToList();
-
                     var datesInRange = GetDatesInRange(_selectedDates[0], _selectedDates[1]);
 
-                    // Собираем соответствующие VisualElement
+
                     var visualElements = new List<VisualElement>();
                     foreach (var date in datesInRange)
                     {
@@ -260,16 +262,21 @@ namespace Custom.MAUI.Calendar
                         }
                     }
 
-                    // Создаем аргументы события
+
                     var eventArgs = new DateRangeTappedEventArgs
                     {
                         StartDate = _selectedDates[0],
                         EndDate = _selectedDates[1],
                         VisualElements = visualElements
                     };
-
                     DateRangeSelected?.Invoke(this, eventArgs);
                 }
+
+                if (_selectedDates.Count == 1)
+                {
+                    DateSelected?.Invoke(this, new DayTappedEventArgs { Date = selectedDate });
+                }
+
             }
 
             _selectedDate = _selectedDates.Count == 1 ? _selectedDates[0] : (DateTime?)null;
