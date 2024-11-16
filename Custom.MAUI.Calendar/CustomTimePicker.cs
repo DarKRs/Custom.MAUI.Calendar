@@ -142,7 +142,6 @@ namespace Custom.MAUI.Calendar
             if (TimeSpan.TryParse(e.NewTextValue, out TimeSpan newTime))
             {
                 _selectedTime = newTime;
-                TimeSelected?.Invoke(this, newTime);
             }
         }
 
