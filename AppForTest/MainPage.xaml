@@ -16,7 +16,7 @@
 
 
             <StackLayout>
-                <controls:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50"/>
+                <controls:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm"/>
             </StackLayout>
 
             <Label x:Name="SelectedDateLabel"

@@ -11,20 +11,18 @@ namespace Custom.MAUI.Calendar.Views
     public class TimePickerPopup : Popup
     {
         private TimeSpan _selectedTime;
+        private string TimeFormat;
         public event EventHandler<TimeSpan> TimeSelected;
 
-        public TimePickerPopup(TimeSpan initialTime)
+        public TimePickerPopup(TimeSpan initialTime, string format)
         {
             _selectedTime = initialTime;
+            TimeFormat = format.ToLower();
             CreatePopupContent();
         }
 
         private void CreatePopupContent()
         {
-            var hoursView = CreateTimeScrollView(0, 23, _selectedTime.Hours, value => UpdateSelectedTime(value, _selectedTime.Minutes, _selectedTime.Seconds));
-            var minutesView = CreateTimeScrollView(0, 59, _selectedTime.Minutes, value => UpdateSelectedTime(_selectedTime.Hours, value, _selectedTime.Seconds));
-            var secondsView = CreateTimeScrollView(0, 59, _selectedTime.Seconds, value => UpdateSelectedTime(_selectedTime.Hours, _selectedTime.Minutes, value));
-
             var grid = new Grid
             {
                 BackgroundColor = Colors.Transparent,
@@ -33,69 +31,38 @@ namespace Custom.MAUI.Calendar.Views
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = GridLength.Auto }
-            },
+                {
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = GridLength.Auto }
+                },
                 RowDefinitions =
+                {
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = GridLength.Auto }
+                }
+            };
+
+            int currentColumn = 0;
+
+
+            if (TimeFormat.Contains("hh"))
             {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
+                AddTimeComponent(grid, "Hour", 0, 23, _selectedTime.Hours, value => UpdateSelectedTime(value, _selectedTime.Minutes, _selectedTime.Seconds), currentColumn);
+                currentColumn++;
             }
-            };
 
-            var hoursLabel = new Label
+            if (TimeFormat.Contains("mm"))
             {
-                Text = "Hour",
-                TextColor = Colors.Black,
-                HorizontalOptions = LayoutOptions.Center,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 2) 
-            };
-            var minutesLabel = new Label
+                AddTimeComponent(grid, "Minute", 0, 59, _selectedTime.Minutes, value => UpdateSelectedTime(_selectedTime.Hours, value, _selectedTime.Seconds), currentColumn);
+                currentColumn++;
+            }
+
+            if (TimeFormat.Contains("ss"))
             {
-                Text = "Minute",
-                TextColor = Colors.Black,
-                HorizontalOptions = LayoutOptions.Center,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 2) 
-            };
-            var secondsLabel = new Label
-            {
-                Text = "Second",
-                TextColor = Colors.Black,
-                HorizontalOptions = LayoutOptions.Center,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 2) 
-            };
-
-            grid.Children.Add(hoursLabel);
-            Grid.SetRow(hoursLabel, 0);
-            Grid.SetColumn(hoursLabel, 0);
-
-            grid.Children.Add(minutesLabel);
-            Grid.SetRow(minutesLabel, 0);
-            Grid.SetColumn(minutesLabel, 1);
-
-            grid.Children.Add(secondsLabel);
-            Grid.SetRow(secondsLabel, 0);
-            Grid.SetColumn(secondsLabel, 2);
-
-            grid.Children.Add(hoursView);
-            Grid.SetRow(hoursView, 1);
-            Grid.SetColumn(hoursView, 0);
-
-            grid.Children.Add(minutesView);
-            Grid.SetRow(minutesView, 1);
-            Grid.SetColumn(minutesView, 1);
-
-            grid.Children.Add(secondsView);
-            Grid.SetRow(secondsView, 1);
-            Grid.SetColumn(secondsView, 2);
+                AddTimeComponent(grid, "Second", 0, 59, _selectedTime.Seconds, value => UpdateSelectedTime(_selectedTime.Hours, _selectedTime.Minutes, value), currentColumn);
+                currentColumn++;
+            }
 
             var stackLayout = new StackLayout
             {
@@ -116,6 +83,28 @@ namespace Custom.MAUI.Calendar.Views
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
             };
+        }
+
+        private void AddTimeComponent(Grid grid, string labelText, int minValue, int maxValue, int initialValue, Action<int> onValueSelected, int columnIndex)
+        {
+            var label = new Label
+            {
+                Text = labelText,
+                TextColor = Colors.Black,
+                HorizontalOptions = LayoutOptions.Center,
+                FontSize = 14,
+                FontAttributes = FontAttributes.Bold,
+                Padding = new Thickness(0, 0, 0, 2)
+            };
+            var timeScrollView = CreateTimeScrollView(minValue, maxValue, initialValue, onValueSelected);
+
+            grid.Children.Add(label);
+            Grid.SetRow(label, 0);
+            Grid.SetColumn(label, columnIndex);
+
+            grid.Children.Add(timeScrollView);
+            Grid.SetRow(timeScrollView, 1);
+            Grid.SetColumn(timeScrollView, columnIndex);
         }
 
         private ScrollView CreateTimeScrollView(int minValue, int maxValue, int selectedValue, Action<int> onValueSelected)

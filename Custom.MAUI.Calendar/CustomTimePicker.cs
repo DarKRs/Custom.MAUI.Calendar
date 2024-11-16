@@ -14,7 +14,7 @@ namespace Custom.MAUI.Calendar
 {
     public class CustomTimePicker : ContentView
     {
-        private TimeSpan _selectedTime;
+        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay;
         private Entry _timeEntry;
         private Button _dropdownButton;
         private AbsoluteLayout _absoluteLayout;
@@ -23,7 +23,7 @@ namespace Custom.MAUI.Calendar
         public event EventHandler<TimeSpan> TimeSelected;
 
         public static readonly BindableProperty SelectedTimeProperty = BindableProperty.Create(
-            nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker),default(TimeSpan),propertyChanged: OnSelectedTimeChanged);
+            nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker), DateTime.Now.TimeOfDay, propertyChanged: OnSelectedTimeChanged);
 
         public TimeSpan SelectedTime
         {
@@ -49,12 +49,21 @@ namespace Custom.MAUI.Calendar
             set => SetValue(CustomHeightProperty, value);
         }
 
+        public static readonly BindableProperty TimeFormatProperty = BindableProperty.Create(
+            nameof(TimeFormat), typeof(string), typeof(CustomTimePicker), "HH:mm:ss", propertyChanged: OnTimeFormatChanged);
+
+        public string TimeFormat
+        {
+            get => (string)GetValue(TimeFormatProperty);
+            set => SetValue(TimeFormatProperty, value);
+        }
+
         private static void OnSelectedTimeChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is CustomTimePicker timePicker && newValue is TimeSpan newTime)
             {
                 timePicker._selectedTime = newTime;
-                timePicker._timeEntry.Text = newTime.ToString(@"hh\:mm\:ss");
+                timePicker._timeEntry.Text = timePicker.FormatTime(newTime);
             }
         }
 
@@ -66,11 +75,19 @@ namespace Custom.MAUI.Calendar
             }
         }
 
+        private static void OnTimeFormatChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomTimePicker customTimePicker && newValue is string newFormat)
+            {
+                customTimePicker.UpdateTimeDisplayFormat(newFormat);
+            }
+        }
+
         public CustomTimePicker()
         {
             _timeEntry = new Entry
             {
-                Text = DateTime.Now.TimeOfDay.ToString(@"hh\:mm\:ss"),
+                Text = FormatTime(_selectedTime),
                 HorizontalOptions = LayoutOptions.FillAndExpand,
                 VerticalOptions = LayoutOptions.Center
             };
@@ -123,16 +140,16 @@ namespace Custom.MAUI.Calendar
             _dropdownButton.FontSize = 10 * scaleFactor;
         }
 
-        private void ToggleTimePickerPopup()
+        private async void ToggleTimePickerPopup()
         {
             if (_popup == null)
             {
-                _popup = new TimePickerPopup(_selectedTime);
+                _popup = new TimePickerPopup(_selectedTime, TimeFormat);
                 _popup.TimeSelected += OnPopupTimeSelected;
                 _popup.Closed += OnPopupClosed;
 
                 var currentPage = GetCurrentPage();
-                currentPage?.ShowPopup(_popup);
+                await currentPage?.ShowPopupAsync(_popup);
             }
             else
             {
@@ -144,7 +161,7 @@ namespace Custom.MAUI.Calendar
         private void OnPopupTimeSelected(object sender, TimeSpan e)
         {
             _selectedTime = e;
-            _timeEntry.Text = _selectedTime.ToString(@"hh\:mm\:ss");
+            _timeEntry.Text = FormatTime(_selectedTime);
             TimeSelected?.Invoke(this, _selectedTime);
         }
 
@@ -160,10 +177,23 @@ namespace Custom.MAUI.Calendar
 
         private void OnTimeEntryTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (TimeSpan.TryParse(e.NewTextValue, out TimeSpan newTime))
+            if (TimeSpan.TryParseExact(e.NewTextValue, TimeFormat, CultureInfo.InvariantCulture, out TimeSpan newTime))
             {
                 _selectedTime = newTime;
             }
+        }
+
+        private void UpdateTimeDisplayFormat(string format)
+        {
+            _timeEntry.Text = FormatTime(_selectedTime);
+            _popup?.Close();
+            _popup = new TimePickerPopup(_selectedTime, TimeFormat);
+        }
+
+        private string FormatTime(TimeSpan time)
+        {
+            var dateTime = new DateTime(time.Ticks);
+            return dateTime.ToString(TimeFormat);
         }
 
         private Page GetCurrentPage()
