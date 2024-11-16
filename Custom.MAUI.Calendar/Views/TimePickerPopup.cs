@@ -15,7 +15,6 @@ namespace Custom.MAUI.Calendar.Views
 
         public TimePickerPopup(TimeSpan initialTime)
         {
-            Size = new Size(200, 280);
             _selectedTime = initialTime;
             CreatePopupContent();
         }
@@ -29,26 +28,28 @@ namespace Custom.MAUI.Calendar.Views
             var grid = new Grid
             {
                 BackgroundColor = Colors.Transparent,
-                WidthRequest = 180, 
-                Padding = new Thickness(8),
                 ColumnSpacing = 15,
+                RowSpacing = 10,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
                 ColumnDefinitions =
-                {
-                    new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Auto }
-                },
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
                 RowDefinitions =
-                {
-                    new RowDefinition { Height = GridLength.Auto },
-                    new RowDefinition { Height = GridLength.Auto }
-                }
+            {
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Auto }
+            }
             };
 
-            // Header labels with increased size
+            // Header labels
             var hoursLabel = new Label
             {
                 Text = "Hour",
+                TextColor = Colors.Black,
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
@@ -57,6 +58,7 @@ namespace Custom.MAUI.Calendar.Views
             var minutesLabel = new Label
             {
                 Text = "Minute",
+                TextColor = Colors.Black,
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
@@ -65,6 +67,7 @@ namespace Custom.MAUI.Calendar.Views
             var secondsLabel = new Label
             {
                 Text = "Second",
+                TextColor = Colors.Black,
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
@@ -83,7 +86,6 @@ namespace Custom.MAUI.Calendar.Views
             Grid.SetRow(secondsLabel, 0);
             Grid.SetColumn(secondsLabel, 2);
 
-            // Time selection views
             grid.Children.Add(hoursView);
             Grid.SetRow(hoursView, 1);
             Grid.SetColumn(hoursView, 0);
@@ -99,16 +101,21 @@ namespace Custom.MAUI.Calendar.Views
             var stackLayout = new StackLayout
             {
                 Children = { grid },
-                Padding = new Thickness(5)
+                Padding = new Thickness(5), // Уменьшение Padding для минимизации пространства
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
             };
 
             Content = new Frame
             {
                 Content = stackLayout,
-                CornerRadius = 15, 
-                BackgroundColor = Colors.Transparent,
-                Padding = new Thickness(5),
-                Margin = new Thickness(15)
+                CornerRadius = 10,
+                BackgroundColor = Colors.White,
+                Padding = new Thickness(5), // Уменьшение Padding
+                Margin = new Thickness(5),  // Уменьшение Margin
+                HasShadow = true,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
             };
         }
 
@@ -117,8 +124,11 @@ namespace Custom.MAUI.Calendar.Views
             var stackLayout = new StackLayout
             {
                 Orientation = StackOrientation.Vertical,
-                Spacing = 8 
+                Spacing = 8,
+                HorizontalOptions = LayoutOptions.Center
             };
+
+            Label initialLabel = null;
 
             for (int i = minValue; i <= maxValue; i++)
             {
@@ -127,49 +137,58 @@ namespace Custom.MAUI.Calendar.Views
                     Text = i.ToString("D2"),
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    Padding = new Thickness(10),
+                    Padding = new Thickness(10, 5),
                     FontSize = 12,
-                    TextColor = i == selectedValue ? Colors.White : Colors.Black
-                };
-
-                var labelFrame = new Frame
-                {
-                    Content = label,
+                    TextColor = i == selectedValue ? Colors.White : Colors.Black,
                     BackgroundColor = i == selectedValue ? Colors.Purple : Colors.Transparent,
-                    CornerRadius = 4, 
-                    Padding = new Thickness(0),
                     Margin = new Thickness(3),
-                    HasShadow = false 
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center
                 };
 
-                // Add Gesture Recognizer to the Frame
+                if (i == selectedValue)
+                {
+                    initialLabel = label;
+                }
+
                 label.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(() =>
                     {
                         foreach (var child in stackLayout.Children)
                         {
-                            if (child is Frame frame && frame.Content is Label lbl)
+                            if (child is Label lbl)
                             {
-                                frame.BackgroundColor = Colors.Transparent;
+                                lbl.BackgroundColor = Colors.Transparent;
                                 lbl.TextColor = Colors.Black;
                             }
                         }
-                        labelFrame.BackgroundColor = Colors.Purple;
+                        label.BackgroundColor = Colors.Purple;
                         label.TextColor = Colors.White;
                         onValueSelected(int.Parse(label.Text));
                     })
                 });
 
-                stackLayout.Children.Add(labelFrame);
+                stackLayout.Children.Add(label);
             }
 
-            return new ScrollView
+            var scrollView = new ScrollView
             {
                 Content = stackLayout,
-                HeightRequest = 200, 
-                VerticalScrollBarVisibility = ScrollBarVisibility.Never
+                HeightRequest = 150, // Ограничение высоты для ScrollView
+                VerticalScrollBarVisibility = ScrollBarVisibility.Never,
+                HorizontalOptions = LayoutOptions.FillAndExpand
             };
+
+            scrollView.Loaded += (s, e) =>
+            {
+                if (initialLabel != null)
+                {
+                    scrollView.ScrollToAsync(initialLabel, ScrollToPosition.Center, animated: false);
+                }
+            };
+
+            return scrollView;
         }
 
         private void UpdateSelectedTime(int hours, int minutes, int seconds)
@@ -178,5 +197,4 @@ namespace Custom.MAUI.Calendar.Views
             TimeSelected?.Invoke(this, _selectedTime);
         }
     }
-
 }
