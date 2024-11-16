@@ -15,6 +15,7 @@ namespace Custom.MAUI.Calendar.Views
 
         public TimePickerPopup(TimeSpan initialTime)
         {
+            Size = new Size(200, 280);
             _selectedTime = initialTime;
             CreatePopupContent();
         }
@@ -27,23 +28,24 @@ namespace Custom.MAUI.Calendar.Views
 
             var grid = new Grid
             {
-                BackgroundColor = Colors.LightGray,
-                WidthRequest = 180,
-                Padding = new Thickness(10),
+                BackgroundColor = Colors.Transparent,
+                WidthRequest = 180, 
+                Padding = new Thickness(8),
+                ColumnSpacing = 15,
                 ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Star }
-            },
+                {
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = GridLength.Auto }
+                },
                 RowDefinitions =
-            {
-                new RowDefinition { Height = GridLength.Auto },
-                new RowDefinition { Height = GridLength.Auto }
-            }
+                {
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = GridLength.Auto }
+                }
             };
 
-            // Header labels
+            // Header labels with increased size
             var hoursLabel = new Label
             {
                 Text = "Hour",
@@ -81,6 +83,7 @@ namespace Custom.MAUI.Calendar.Views
             Grid.SetRow(secondsLabel, 0);
             Grid.SetColumn(secondsLabel, 2);
 
+            // Time selection views
             grid.Children.Add(hoursView);
             Grid.SetRow(hoursView, 1);
             Grid.SetColumn(hoursView, 0);
@@ -93,33 +96,19 @@ namespace Custom.MAUI.Calendar.Views
             Grid.SetRow(secondsView, 1);
             Grid.SetColumn(secondsView, 2);
 
-            var closeButton = new Button
-            {
-                Text = "Done",
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.End,
-                BackgroundColor = Colors.Purple,
-                TextColor = Colors.White,
-                CornerRadius = 10,
-                Padding = new Thickness(10)
-            };
-
-            closeButton.Clicked += (s, e) => Close();
-
             var stackLayout = new StackLayout
             {
-                Children = { grid, closeButton },
-                Padding = new Thickness(10)
+                Children = { grid },
+                Padding = new Thickness(5)
             };
 
             Content = new Frame
             {
                 Content = stackLayout,
-                CornerRadius = 12,
-                BackgroundColor = Colors.White,
+                CornerRadius = 15, 
+                BackgroundColor = Colors.Transparent,
                 Padding = new Thickness(5),
-                Margin = new Thickness(20),
-                BorderColor = Colors.Gray
+                Margin = new Thickness(15)
             };
         }
 
@@ -128,7 +117,7 @@ namespace Custom.MAUI.Calendar.Views
             var stackLayout = new StackLayout
             {
                 Orientation = StackOrientation.Vertical,
-                Spacing = 5
+                Spacing = 8 
             };
 
             for (int i = minValue; i <= maxValue; i++)
@@ -138,38 +127,47 @@ namespace Custom.MAUI.Calendar.Views
                     Text = i.ToString("D2"),
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    Padding = new Thickness(5),
-                    Margin = new Thickness(2),
-                    BackgroundColor = i == selectedValue ? Colors.Purple : Colors.Transparent,
-                    TextColor = Colors.Black,
-                    FontSize = 16
+                    Padding = new Thickness(10),
+                    FontSize = 12,
+                    TextColor = i == selectedValue ? Colors.White : Colors.Black
                 };
 
+                var labelFrame = new Frame
+                {
+                    Content = label,
+                    BackgroundColor = i == selectedValue ? Colors.Purple : Colors.Transparent,
+                    CornerRadius = 4, 
+                    Padding = new Thickness(0),
+                    Margin = new Thickness(3),
+                    HasShadow = false 
+                };
+
+                // Add Gesture Recognizer to the Frame
                 label.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(() =>
                     {
                         foreach (var child in stackLayout.Children)
                         {
-                            if (child is Label lbl)
+                            if (child is Frame frame && frame.Content is Label lbl)
                             {
-                                lbl.BackgroundColor = Colors.Transparent;
+                                frame.BackgroundColor = Colors.Transparent;
                                 lbl.TextColor = Colors.Black;
                             }
                         }
-                        label.BackgroundColor = Colors.Purple;
+                        labelFrame.BackgroundColor = Colors.Purple;
                         label.TextColor = Colors.White;
                         onValueSelected(int.Parse(label.Text));
                     })
                 });
 
-                stackLayout.Children.Add(label);
+                stackLayout.Children.Add(labelFrame);
             }
 
             return new ScrollView
             {
                 Content = stackLayout,
-                HeightRequest = 150,
+                HeightRequest = 200, 
                 VerticalScrollBarVisibility = ScrollBarVisibility.Never
             };
         }

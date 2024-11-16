@@ -12,19 +12,6 @@
 
             <controls:CustomCalendar x:Name="Calendar"
                       DisplayMode="SeparateMonthYear">
-                <controls:CustomCalendar.Style>
-                    <controls:CalendarStyle BackgroundColor="LightYellow"
-                                    TodayBackgroundColor="LightBlue"
-                                    SelectedDateBackgroundColor="LightGreen"
-                                    DateRangeBackgroundColor="LightCoral"
-                                    NavigationButtonBackgroundColor="Gray"
-                                    NavigationButtonTextColor="White"
-                                    LabelTextColor="Black"
-                                    LabelFontSize="18"
-                                    DayButtonPadding="10"
-                                    NavigationButtonSize="50"
-                                    NavigationButtonCornerRadius="25"/>
-                </controls:CustomCalendar.Style>
             </controls:CustomCalendar>
 
 

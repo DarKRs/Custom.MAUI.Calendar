@@ -1,4 +1,5 @@
-﻿using Custom.MAUI.Calendar.Views;
+﻿using Custom.MAUI.Calendar.Styles;
+using Custom.MAUI.Calendar.Views;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using System;

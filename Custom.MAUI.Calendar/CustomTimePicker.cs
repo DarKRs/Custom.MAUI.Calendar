@@ -45,8 +45,8 @@ namespace Custom.MAUI.Calendar
 
         public CustomTimePicker()
         {
-            WidthRequest = 150;
-            HeightRequest = 40;
+            WidthRequest = 120; // Reduced width
+            HeightRequest = 40; // Adjusted height
 
             _selectedTime = DateTime.Now.TimeOfDay;
 
