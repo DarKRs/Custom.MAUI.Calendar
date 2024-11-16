@@ -9,13 +9,14 @@ using Microsoft.Maui.Layouts;
 
 namespace Custom.MAUI.Calendar
 {
-    public class CustomTimePicker : ContentView
+    public class CustomTimePicker : Grid
     {
         private TimeSpan _selectedTime;
         private Entry _timeEntry;
         private Button _dropdownButton;
         private AbsoluteLayout _popupOverlay;
         private Grid _popupContent;
+        private AbsoluteLayout _absoluteLayout;
 
         public event EventHandler<TimeSpan> TimeSelected;
 
@@ -72,17 +73,26 @@ namespace Custom.MAUI.Calendar
             _dropdownButton.Clicked += (s, e) => ToggleTimePickerPopup();
             _timeEntry.Focused += (s, e) => ShowTimePickerPopup();
 
-            var layout = new Grid
+            var inputLayout = new Grid
             {
-                Children = { _timeEntry, _dropdownButton },
                 ColumnDefinitions = new ColumnDefinitionCollection
-                {
-                    new ColumnDefinition { Width = GridLength.Star },
-                    new ColumnDefinition { Width = GridLength.Auto }
-                }
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            },
+                Children = { _timeEntry, _dropdownButton }
             };
 
-            Content = layout;
+            Grid.SetColumn(_timeEntry, 0);
+            Grid.SetColumn(_dropdownButton, 1);
+
+            _absoluteLayout = new AbsoluteLayout();
+
+            // Добавляем inputLayout в AbsoluteLayout
+            _absoluteLayout.Children.Add(inputLayout);
+
+            // Добавляем AbsoluteLayout в Grid (т.е. в сам элемент управления)
+            this.Children.Add(_absoluteLayout);
         }
 
         private void ToggleTimePickerPopup()
@@ -101,7 +111,7 @@ namespace Custom.MAUI.Calendar
         {
             if (_popupOverlay != null)
             {
-                return; // Prevent multiple popups
+                return; // Предотвращаем множественные всплывающие окна
             }
 
             _popupOverlay = new AbsoluteLayout
@@ -116,7 +126,7 @@ namespace Custom.MAUI.Calendar
                 BackgroundColor = Colors.White,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                WidthRequest = this.Width, // Match width of CustomTimePicker
+                WidthRequest = this.Width,
                 Padding = 10
             };
 
@@ -137,16 +147,36 @@ namespace Custom.MAUI.Calendar
             _popupContent.Children.Add(secondsView);
             Grid.SetColumn(secondsView, 2);
 
-            // Positioning popup content in the center of the overlay
+            // Центрируем всплывающее содержимое
             AbsoluteLayout.SetLayoutFlags(_popupContent, AbsoluteLayoutFlags.PositionProportional);
-            AbsoluteLayout.SetLayoutBounds(_popupContent, new Rect(0.5, 0.5, -1, -1)); // Centered
+            AbsoluteLayout.SetLayoutBounds(_popupContent, new Rect(0.5, 0.5, -1, -1));
 
             _popupOverlay.Children.Add(_popupContent);
 
-            // Adding overlay to the nearest layout that can host it
-            if (Parent is Layout parentLayout)
+            // Добавляем жест для закрытия при нажатии вне всплывающего окна
+            _popupOverlay.GestureRecognizers.Add(new TapGestureRecognizer
             {
-                parentLayout.Children.Add(_popupOverlay);
+                Command = new Command(() =>
+                {
+                    CloseTimePickerPopup();
+                })
+            });
+
+            _popupContent.InputTransparent = false;
+            _popupOverlay.InputTransparent = false;
+
+            // Добавляем всплывающее окно в внутренний AbsoluteLayout
+            _absoluteLayout.Children.Add(_popupOverlay);
+            AbsoluteLayout.SetLayoutFlags(_popupOverlay, AbsoluteLayoutFlags.All);
+            AbsoluteLayout.SetLayoutBounds(_popupOverlay, new Rect(0, 0, 1, 1)); // Заполняем весь доступный размер
+        }
+
+        private void CloseTimePickerPopup()
+        {
+            if (_popupOverlay != null)
+            {
+                _absoluteLayout.Children.Remove(_popupOverlay);
+                _popupOverlay = null;
             }
         }
 
@@ -193,7 +223,7 @@ namespace Custom.MAUI.Calendar
             {
                 Content = stackLayout,
                 HeightRequest = 150,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Never // Hide scrollbars
+                VerticalScrollBarVisibility = ScrollBarVisibility.Never // Скрыть полосу прокрутки
             };
         }
 
@@ -202,15 +232,7 @@ namespace Custom.MAUI.Calendar
             _selectedTime = new TimeSpan(hours, minutes, seconds);
             _timeEntry.Text = _selectedTime.ToString(@"hh\:mm\:ss");
             TimeSelected?.Invoke(this, _selectedTime);
-        }
-
-        private void CloseTimePickerPopup()
-        {
-            if (_popupOverlay != null && Parent is Layout parentLayout)
-            {
-                parentLayout.Children.Remove(_popupOverlay);
-                _popupOverlay = null;
-            }
+            CloseTimePickerPopup();
         }
 
         private void OnTimeEntryTextChanged(object sender, TextChangedEventArgs e)
