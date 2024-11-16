@@ -89,9 +89,12 @@ namespace Custom.MAUI.Calendar
             {
                 Text = FormatTime(_selectedTime),
                 HorizontalOptions = LayoutOptions.FillAndExpand,
-                VerticalOptions = LayoutOptions.Center
+                VerticalOptions = LayoutOptions.Center,
+                Placeholder = TimeFormat,
+                Keyboard = Keyboard.Numeric
             };
             _timeEntry.TextChanged += OnTimeEntryTextChanged;
+            _timeEntry.Unfocused += OnTimeEntryUnfocused;
 
             _dropdownButton = new Button
             {
@@ -177,9 +180,43 @@ namespace Custom.MAUI.Calendar
 
         private void OnTimeEntryTextChanged(object sender, TextChangedEventArgs e)
         {
-            if (TimeSpan.TryParseExact(e.NewTextValue, TimeFormat, CultureInfo.InvariantCulture, out TimeSpan newTime))
+            if (string.IsNullOrWhiteSpace(e.NewTextValue))
+                return;
+
+            var entry = (Entry)sender;
+            string input = e.NewTextValue;
+
+            int originalCursorPosition = entry.CursorPosition;
+
+            // Форматируем ввод
+            input = FormatTimeInput(input, e.OldTextValue);
+
+            // Устанавливаем текст и позицию курсора, только если текст изменился
+            if (entry.Text != input)
             {
-                _selectedTime = newTime;
+                entry.Text = input;
+
+                if (originalCursorPosition < input.Length)
+                    entry.CursorPosition = originalCursorPosition;
+                else
+                    entry.CursorPosition = input.Length; 
+            }
+        }
+
+        private void OnTimeEntryUnfocused(object sender, FocusEventArgs e)
+        {
+            //Для TimeSpan нужен формат вида hh\\:mm
+            string TimeSpanFormat = TimeFormat.ToLower().Replace(":", "\\:");
+            if (TimeSpan.TryParseExact(_timeEntry.Text, TimeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
+            {
+
+                _selectedTime = parsedTime;
+                _timeEntry.Text = FormatTime(_selectedTime);
+            }
+            else
+            {
+                // Если формат некорректен, возвращаем последнее корректное значение
+                _timeEntry.Text = FormatTime(_selectedTime);
             }
         }
 
@@ -194,6 +231,80 @@ namespace Custom.MAUI.Calendar
         {
             var dateTime = new DateTime(time.Ticks);
             return dateTime.ToString(TimeFormat);
+        }
+
+        private string FormatTimeInput(string input, string previousInput)
+        {
+            // Ограничение длины текста в зависимости от формата (например, HH:mm:ss)
+            int maxLength = TimeFormat.Replace(":", "").Length + (TimeFormat.Contains(":") ? TimeFormat.Count(c => c == ':') : 0);
+            if (input.Length > maxLength)
+                input = input.Substring(0, maxLength);
+
+            // Проверка на допустимые символы (цифры и символ ":")
+            if (!System.Text.RegularExpressions.Regex.IsMatch(input, @"^\d{0,2}:?\d{0,2}:?\d{0,2}$"))
+                return previousInput;
+
+            // Автоматическое добавление ведущего нуля, если пользователь завершил ввод часов
+            if (TimeFormat.Contains("HH") && input.Length == 2 && !input.Contains(":"))
+            {
+                if (int.TryParse(input, out int hour) && hour >= 0 && hour <= 9)
+                {
+                    input = $"0{hour}:";
+                }
+            }
+
+            // Автоматическое добавление двоеточия, если это необходимо по текущему формату
+            if (TimeFormat.Contains("HH") && input.Length == 2 && !input.Contains(":"))
+                input += ":";
+
+            if (TimeFormat.Contains("mm") && input.Length == 5 && TimeFormat.Contains("ss"))
+                input += ":";
+
+            // Разделяем на компоненты времени и корректируем
+            string[] parts = input.Split(':');
+            if (TimeFormat.Contains("HH") && parts.Length >= 1)
+                input = CorrectHours(parts);
+            if (TimeFormat.Contains("mm") && parts.Length >= 2)
+                input = CorrectMinutes(parts, input);
+            if (TimeFormat.Contains("ss") && parts.Length == 3)
+                input = CorrectSeconds(parts, input);
+
+            return input;
+        }
+
+        private string CorrectHours(string[] parts)
+        {
+            if (int.TryParse(parts[0], out int hours) && hours > 23)
+                return "23" + (parts.Length > 1 ? ":" + parts[1] : "");
+            return string.Join(":", parts);
+        }
+
+        private string CorrectMinutes(string[] parts, string input)
+        {
+            if (parts.Length < 2)
+                return input;
+
+            if (parts[1].Length == 1 && int.TryParse(parts[1], out int firstMinuteDigit) && firstMinuteDigit > 5)
+                return parts[0] + ":59";
+
+            if (int.TryParse(parts[1], out int minutes) && minutes > 59)
+                return parts[0] + ":59";
+
+            return input;
+        }
+
+        private string CorrectSeconds(string[] parts, string input)
+        {
+            if (parts.Length < 3)
+                return input;
+
+            if (parts[2].Length == 1 && int.TryParse(parts[2], out int firstSecondDigit) && firstSecondDigit > 5)
+                return parts[0] + ":" + parts[1] + ":59";
+
+            if (int.TryParse(parts[2], out int seconds) && seconds > 59)
+                return parts[0] + ":" + parts[1] + ":59";
+
+            return input;
         }
 
         private Page GetCurrentPage()
