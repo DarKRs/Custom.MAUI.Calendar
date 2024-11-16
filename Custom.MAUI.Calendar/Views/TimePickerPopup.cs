@@ -29,7 +29,7 @@ namespace Custom.MAUI.Calendar.Views
             {
                 BackgroundColor = Colors.Transparent,
                 ColumnSpacing = 15,
-                RowSpacing = 10,
+                RowSpacing = 5, 
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 ColumnDefinitions =
@@ -45,7 +45,6 @@ namespace Custom.MAUI.Calendar.Views
             }
             };
 
-            // Header labels
             var hoursLabel = new Label
             {
                 Text = "Hour",
@@ -53,7 +52,7 @@ namespace Custom.MAUI.Calendar.Views
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 10)
+                Padding = new Thickness(0, 0, 0, 2) 
             };
             var minutesLabel = new Label
             {
@@ -62,7 +61,7 @@ namespace Custom.MAUI.Calendar.Views
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 10)
+                Padding = new Thickness(0, 0, 0, 2) 
             };
             var secondsLabel = new Label
             {
@@ -71,7 +70,7 @@ namespace Custom.MAUI.Calendar.Views
                 HorizontalOptions = LayoutOptions.Center,
                 FontSize = 14,
                 FontAttributes = FontAttributes.Bold,
-                Padding = new Thickness(0, 0, 0, 10)
+                Padding = new Thickness(0, 0, 0, 2) 
             };
 
             grid.Children.Add(hoursLabel);
@@ -101,7 +100,7 @@ namespace Custom.MAUI.Calendar.Views
             var stackLayout = new StackLayout
             {
                 Children = { grid },
-                Padding = new Thickness(5), // Уменьшение Padding для минимизации пространства
+                Padding = new Thickness(5), 
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
             };
@@ -111,8 +110,8 @@ namespace Custom.MAUI.Calendar.Views
                 Content = stackLayout,
                 CornerRadius = 10,
                 BackgroundColor = Colors.White,
-                Padding = new Thickness(5), // Уменьшение Padding
-                Margin = new Thickness(5),  // Уменьшение Margin
+                Padding = new Thickness(5), 
+                Margin = new Thickness(5),  
                 HasShadow = true,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
@@ -166,6 +165,9 @@ namespace Custom.MAUI.Calendar.Views
                         label.BackgroundColor = Colors.Purple;
                         label.TextColor = Colors.White;
                         onValueSelected(int.Parse(label.Text));
+
+                        // Программная прокрутка, чтобы выделенный элемент оставался по центру
+                        ((ScrollView)stackLayout.Parent).ScrollToAsync(label, ScrollToPosition.Center, true);
                     })
                 });
 
