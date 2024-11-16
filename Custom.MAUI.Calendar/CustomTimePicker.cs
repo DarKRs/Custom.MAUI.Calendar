@@ -6,6 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Maui.Layouts;
+using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Maui.Core;
+using Custom.MAUI.Calendar.Views;
 
 namespace Custom.MAUI.Calendar
 {
@@ -14,9 +17,7 @@ namespace Custom.MAUI.Calendar
         private TimeSpan _selectedTime;
         private Entry _timeEntry;
         private Button _dropdownButton;
-        private AbsoluteLayout _popupOverlay;
-        private Grid _popupContent;
-        private AbsoluteLayout _absoluteLayout;
+        private TimePickerPopup _popup;
 
         public event EventHandler<TimeSpan> TimeSelected;
 
@@ -58,6 +59,8 @@ namespace Custom.MAUI.Calendar
             };
 
             _timeEntry.TextChanged += OnTimeEntryTextChanged;
+            _timeEntry.Focused += OnTimeEntryFocused;
+
             _dropdownButton = new Button
             {
                 Text = "▼",
@@ -70,8 +73,7 @@ namespace Custom.MAUI.Calendar
                 Margin = new Thickness(0)
             };
 
-            _dropdownButton.Clicked += (s, e) => ToggleTimePickerPopup();
-            _timeEntry.Focused += (s, e) => ShowTimePickerPopup();
+            _dropdownButton.Clicked += OnDropdownButtonClicked;
 
             var inputLayout = new Grid
             {
@@ -79,160 +81,60 @@ namespace Custom.MAUI.Calendar
             {
                 new ColumnDefinition { Width = GridLength.Star },
                 new ColumnDefinition { Width = GridLength.Auto }
-            },
-                Children = { _timeEntry, _dropdownButton }
+            }
             };
 
+            inputLayout.Children.Add(_timeEntry);
             Grid.SetColumn(_timeEntry, 0);
+
+            inputLayout.Children.Add(_dropdownButton);
             Grid.SetColumn(_dropdownButton, 1);
 
-            _absoluteLayout = new AbsoluteLayout();
-
-            // Добавляем inputLayout в AbsoluteLayout
-            _absoluteLayout.Children.Add(inputLayout);
-
-            // Добавляем AbsoluteLayout в Grid (т.е. в сам элемент управления)
-            this.Children.Add(_absoluteLayout);
+            this.Children.Add(inputLayout);
         }
 
-        private void ToggleTimePickerPopup()
+        private void OnDropdownButtonClicked(object sender, EventArgs e)
         {
-            if (_popupOverlay != null)
-            {
-                CloseTimePickerPopup();
-            }
-            else
-            {
-                ShowTimePickerPopup();
-            }
+            ShowTimePickerPopup();
+        }
+
+        private void OnTimeEntryFocused(object sender, FocusEventArgs e)
+        {
+            ShowTimePickerPopup();
         }
 
         private void ShowTimePickerPopup()
         {
-            if (_popupOverlay != null)
+            if (_popup != null)
             {
-                return; // Предотвращаем множественные всплывающие окна
+                return;
             }
 
-            _popupOverlay = new AbsoluteLayout
-            {
-                BackgroundColor = new Color(0, 0, 0, 0),
-                VerticalOptions = LayoutOptions.FillAndExpand,
-                HorizontalOptions = LayoutOptions.FillAndExpand
-            };
+            _popup = new TimePickerPopup(_selectedTime);
+            _popup.TimeSelected += OnPopupTimeSelected;
+            _popup.Closed += OnPopupClosed;
 
-            _popupContent = new Grid
-            {
-                BackgroundColor = Colors.White,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                WidthRequest = this.Width,
-                Padding = 10
-            };
-
-            var hoursView = CreateTimeScrollView(0, 23, _selectedTime.Hours, value => UpdateSelectedTime(value, _selectedTime.Minutes, _selectedTime.Seconds));
-            var minutesView = CreateTimeScrollView(0, 59, _selectedTime.Minutes, value => UpdateSelectedTime(_selectedTime.Hours, value, _selectedTime.Seconds));
-            var secondsView = CreateTimeScrollView(0, 59, _selectedTime.Seconds, value => UpdateSelectedTime(_selectedTime.Hours, _selectedTime.Minutes, value));
-
-            _popupContent.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-            _popupContent.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-            _popupContent.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-
-            _popupContent.Children.Add(hoursView);
-            Grid.SetColumn(hoursView, 0);
-
-            _popupContent.Children.Add(minutesView);
-            Grid.SetColumn(minutesView, 1);
-
-            _popupContent.Children.Add(secondsView);
-            Grid.SetColumn(secondsView, 2);
-
-            // Центрируем всплывающее содержимое
-            AbsoluteLayout.SetLayoutFlags(_popupContent, AbsoluteLayoutFlags.PositionProportional);
-            AbsoluteLayout.SetLayoutBounds(_popupContent, new Rect(0.5, 0.5, -1, -1));
-
-            _popupOverlay.Children.Add(_popupContent);
-
-            // Добавляем жест для закрытия при нажатии вне всплывающего окна
-            _popupOverlay.GestureRecognizers.Add(new TapGestureRecognizer
-            {
-                Command = new Command(() =>
-                {
-                    CloseTimePickerPopup();
-                })
-            });
-
-            _popupContent.InputTransparent = false;
-            _popupOverlay.InputTransparent = false;
-
-            // Добавляем всплывающее окно в внутренний AbsoluteLayout
-            _absoluteLayout.Children.Add(_popupOverlay);
-            AbsoluteLayout.SetLayoutFlags(_popupOverlay, AbsoluteLayoutFlags.All);
-            AbsoluteLayout.SetLayoutBounds(_popupOverlay, new Rect(0, 0, 1, 1)); // Заполняем весь доступный размер
+            // Получаем текущую страницу для отображения всплывающего окна
+            var currentPage = GetCurrentPage();
+            currentPage?.ShowPopup(_popup);
         }
 
-        private void CloseTimePickerPopup()
+        private void OnPopupTimeSelected(object sender, TimeSpan e)
         {
-            if (_popupOverlay != null)
-            {
-                _absoluteLayout.Children.Remove(_popupOverlay);
-                _popupOverlay = null;
-            }
-        }
-
-        private ScrollView CreateTimeScrollView(int minValue, int maxValue, int selectedValue, Action<int> onValueSelected)
-        {
-            var stackLayout = new StackLayout
-            {
-                Orientation = StackOrientation.Vertical,
-                Spacing = 5
-            };
-
-            for (int i = minValue; i <= maxValue; i++)
-            {
-                var label = new Label
-                {
-                    Text = i.ToString("D2"),
-                    HorizontalOptions = LayoutOptions.Center,
-                    VerticalOptions = LayoutOptions.Center,
-                    Padding = new Thickness(5),
-                    BackgroundColor = i == selectedValue ? Colors.Purple : Colors.Transparent,
-                    TextColor = Colors.Black
-                };
-
-                label.GestureRecognizers.Add(new TapGestureRecognizer
-                {
-                    Command = new Command(() =>
-                    {
-                        foreach (var child in stackLayout.Children)
-                        {
-                            if (child is Label lbl)
-                            {
-                                lbl.BackgroundColor = Colors.Transparent;
-                            }
-                        }
-                        label.BackgroundColor = Colors.Purple;
-                        onValueSelected(int.Parse(label.Text));
-                    })
-                });
-
-                stackLayout.Children.Add(label);
-            }
-
-            return new ScrollView
-            {
-                Content = stackLayout,
-                HeightRequest = 150,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Never // Скрыть полосу прокрутки
-            };
-        }
-
-        private void UpdateSelectedTime(int hours, int minutes, int seconds)
-        {
-            _selectedTime = new TimeSpan(hours, minutes, seconds);
+            _selectedTime = e;
             _timeEntry.Text = _selectedTime.ToString(@"hh\:mm\:ss");
             TimeSelected?.Invoke(this, _selectedTime);
-            CloseTimePickerPopup();
+        }
+
+        private void OnPopupClosed(object sender, PopupClosedEventArgs e)
+        {
+            // Освобождаем ресурсы
+            if (_popup != null)
+            {
+                _popup.TimeSelected -= OnPopupTimeSelected;
+                _popup.Closed -= OnPopupClosed;
+                _popup = null;
+            }
         }
 
         private void OnTimeEntryTextChanged(object sender, TextChangedEventArgs e)
@@ -242,6 +144,20 @@ namespace Custom.MAUI.Calendar
                 _selectedTime = newTime;
                 TimeSelected?.Invoke(this, newTime);
             }
+        }
+
+        private Page GetCurrentPage()
+        {
+            var element = this as Element;
+            while (element != null)
+            {
+                if (element is Page page)
+                {
+                    return page;
+                }
+                element = element.Parent;
+            }
+            return null;
         }
     }
 }
