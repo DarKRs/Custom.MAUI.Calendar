@@ -22,11 +22,7 @@ namespace Custom.MAUI.Calendar
         public event EventHandler<TimeSpan> TimeSelected;
 
         public static readonly BindableProperty SelectedTimeProperty = BindableProperty.Create(
-            nameof(SelectedTime),
-            typeof(TimeSpan),
-            typeof(CustomTimePicker),
-            default(TimeSpan),
-            propertyChanged: OnSelectedTimeChanged);
+            nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker),default(TimeSpan),propertyChanged: OnSelectedTimeChanged);
 
         public TimeSpan SelectedTime
         {
@@ -45,78 +41,76 @@ namespace Custom.MAUI.Calendar
 
         public CustomTimePicker()
         {
-            WidthRequest = 120; // Reduced width
-            HeightRequest = 40; // Adjusted height
+            WidthRequest = 120;
+            HeightRequest = 60;
 
             _selectedTime = DateTime.Now.TimeOfDay;
-
             _timeEntry = new Entry
             {
                 Text = _selectedTime.ToString(@"hh\:mm\:ss"),
                 Keyboard = Keyboard.Text,
                 HorizontalOptions = LayoutOptions.FillAndExpand,
-                VerticalOptions = LayoutOptions.Center
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(0),
+                BackgroundColor = Colors.Transparent 
             };
-
             _timeEntry.TextChanged += OnTimeEntryTextChanged;
-            _timeEntry.Focused += OnTimeEntryFocused;
 
             _dropdownButton = new Button
             {
                 Text = "▼",
-                FontSize = 12,
-                WidthRequest = 30,
-                HeightRequest = 30,
-                HorizontalOptions = LayoutOptions.End,
-                VerticalOptions = LayoutOptions.Center,
+                FontSize = 10,
+                WidthRequest = 5,
+                HeightRequest = 20,
                 Padding = 0,
-                Margin = new Thickness(0)
+                BackgroundColor = Colors.Transparent, 
+                TextColor = Colors.Black,
+                BorderWidth = 0,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+            _dropdownButton.Clicked += (s, e) => ToggleTimePickerPopup();
+
+            // Создаем AbsoluteLayout для наложения кнопки поверх Entry
+            var absoluteLayout = new AbsoluteLayout
+            {
+                WidthRequest = 120,
+                HeightRequest = 60
             };
 
-            _dropdownButton.Clicked += OnDropdownButtonClicked;
 
-            var inputLayout = new Grid
+            AbsoluteLayout.SetLayoutFlags(_timeEntry, AbsoluteLayoutFlags.All);
+            AbsoluteLayout.SetLayoutBounds(_timeEntry, new Rect(0, 0, 1, 1));
+            absoluteLayout.Children.Add(_timeEntry);
+
+            AbsoluteLayout.SetLayoutFlags(_dropdownButton, AbsoluteLayoutFlags.PositionProportional);
+            AbsoluteLayout.SetLayoutBounds(_dropdownButton, new Rect(1, 0.5, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize)); // Сдвигаем кнопку к правому краю и центрируем по вертикали
+
+            absoluteLayout.Children.Add(_dropdownButton);
+
+            this.Children.Add(absoluteLayout);
+        }
+
+
+
+
+
+        private void ToggleTimePickerPopup()
+        {
+            if (_popup == null)
             {
-                ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Auto }
+                _popup = new TimePickerPopup(_selectedTime);
+                _popup.TimeSelected += OnPopupTimeSelected;
+                _popup.Closed += OnPopupClosed;
+
+                var currentPage = GetCurrentPage();
+                currentPage?.ShowPopup(_popup);
             }
-            };
-
-            inputLayout.Children.Add(_timeEntry);
-            Grid.SetColumn(_timeEntry, 0);
-
-            inputLayout.Children.Add(_dropdownButton);
-            Grid.SetColumn(_dropdownButton, 1);
-
-            this.Children.Add(inputLayout);
-        }
-
-        private void OnDropdownButtonClicked(object sender, EventArgs e)
-        {
-            ShowTimePickerPopup();
-        }
-
-        private void OnTimeEntryFocused(object sender, FocusEventArgs e)
-        {
-            ShowTimePickerPopup();
-        }
-
-        private void ShowTimePickerPopup()
-        {
-            if (_popup != null)
+            else
             {
-                return;
+                _popup.Close();
+                _popup = null;
             }
-
-            _popup = new TimePickerPopup(_selectedTime);
-            _popup.TimeSelected += OnPopupTimeSelected;
-            _popup.Closed += OnPopupClosed;
-
-            // Получаем текущую страницу для отображения всплывающего окна
-            var currentPage = GetCurrentPage();
-            currentPage?.ShowPopup(_popup);
         }
 
         private void OnPopupTimeSelected(object sender, TimeSpan e)
@@ -128,7 +122,6 @@ namespace Custom.MAUI.Calendar
 
         private void OnPopupClosed(object sender, PopupClosedEventArgs e)
         {
-            // Освобождаем ресурсы
             if (_popup != null)
             {
                 _popup.TimeSelected -= OnPopupTimeSelected;
@@ -159,4 +152,5 @@ namespace Custom.MAUI.Calendar
             return null;
         }
     }
+
 }
