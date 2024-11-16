@@ -94,7 +94,8 @@ namespace Custom.MAUI.Calendar
                 Keyboard = Keyboard.Numeric
             };
             _timeEntry.TextChanged += OnTimeEntryTextChanged;
-            _timeEntry.Unfocused += OnTimeEntryUnfocused;
+            _timeEntry.Unfocused += OnTimeEntryCompleted;
+            _timeEntry.Completed += OnTimeEntryCompleted;
 
             _dropdownButton = new Button
             {
@@ -203,11 +204,16 @@ namespace Custom.MAUI.Calendar
             }
         }
 
-        private void OnTimeEntryUnfocused(object sender, FocusEventArgs e)
+        private void OnTimeEntryCompleted(object sender, EventArgs e)
         {
+            string input = _timeEntry.Text.Trim();
+
+            // Пробуем обработать "неполный" ввод
+            input = FormatPartialInput(input);
+
             //Для TimeSpan нужен формат вида hh\\:mm
             string TimeSpanFormat = TimeFormat.ToLower().Replace(":", "\\:");
-            if (TimeSpan.TryParseExact(_timeEntry.Text, TimeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
+            if (TimeSpan.TryParseExact(input, TimeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
             {
 
                 _selectedTime = parsedTime;
@@ -268,6 +274,32 @@ namespace Custom.MAUI.Calendar
                 input = CorrectMinutes(parts, input);
             if (TimeFormat.Contains("ss") && parts.Length == 3)
                 input = CorrectSeconds(parts, input);
+
+            return input;
+        }
+
+        private string FormatPartialInput(string input)
+        {
+            string[] parts = input.Split(':');
+            if (parts.Length == 2)
+            {
+                if (parts[0].Length == 1)
+                {
+                    parts[0] = "0" + parts[0];
+                }
+
+                if (parts[1].Length == 1)
+                {
+                    parts[1] = "0" + parts[1];
+                }
+
+                input = string.Join(":", parts);
+            }
+            else if (parts.Length == 1 && parts[0].Length > 0)
+            {
+                // Если только часы введены (например, "4"), добавляем ":00" для минут
+                input = parts[0].PadLeft(2, '0') + ":00";
+            }
 
             return input;
         }
