@@ -42,6 +42,11 @@ namespace AppForTest
             DateRangeLabel.Text = $"Вы выбрали диапазон: {dateRange.StartDate} - {dateRange.EndDate}";
         }
 
+        private void OnTimeSelected(object sender, TimeSpan time)
+        {
+            Debug.WriteLine($"Выбрано время: {time}");
+        }
+
         private void OnCounterClicked(object sender, EventArgs e)
         {
             count++;

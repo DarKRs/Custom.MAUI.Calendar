@@ -28,6 +28,10 @@
             </controls:CustomCalendar>
 
 
+            <StackLayout>
+                <controls:CustomTimePicker TimeSelected="OnTimeSelected" />
+            </StackLayout>
+
             <Label x:Name="SelectedDateLabel"
                 Text="Hello, World!"
                 Style="{StaticResource Headline}"
