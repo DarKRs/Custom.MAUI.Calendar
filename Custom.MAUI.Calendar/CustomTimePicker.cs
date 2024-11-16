@@ -12,11 +12,12 @@ using Custom.MAUI.Calendar.Views;
 
 namespace Custom.MAUI.Calendar
 {
-    public class CustomTimePicker : Grid
+    public class CustomTimePicker : ContentView
     {
         private TimeSpan _selectedTime;
         private Entry _timeEntry;
         private Button _dropdownButton;
+        private AbsoluteLayout _absoluteLayout;
         private TimePickerPopup _popup;
 
         public event EventHandler<TimeSpan> TimeSelected;
@@ -30,6 +31,24 @@ namespace Custom.MAUI.Calendar
             set => SetValue(SelectedTimeProperty, value);
         }
 
+        public static readonly BindableProperty CustomWidthProperty = BindableProperty.Create(
+            nameof(CustomWidth),typeof(double),typeof(CustomTimePicker),120.0, propertyChanged: OnSizePropertyChanged);
+
+        public double CustomWidth
+        {
+            get => (double)GetValue(CustomWidthProperty);
+            set => SetValue(CustomWidthProperty, value);
+        }
+
+        public static readonly BindableProperty CustomHeightProperty = BindableProperty.Create(
+            nameof(CustomHeight),typeof(double),typeof(CustomTimePicker),45.0, propertyChanged: OnSizePropertyChanged);
+
+        public double CustomHeight
+        {
+            get => (double)GetValue(CustomHeightProperty);
+            set => SetValue(CustomHeightProperty, value);
+        }
+
         private static void OnSelectedTimeChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is CustomTimePicker timePicker && newValue is TimeSpan newTime)
@@ -39,20 +58,21 @@ namespace Custom.MAUI.Calendar
             }
         }
 
+        private static void OnSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomTimePicker customTimePicker)
+            {
+                customTimePicker.UpdateLayout();
+            }
+        }
+
         public CustomTimePicker()
         {
-            WidthRequest = 120;
-            HeightRequest = 60;
-
-            _selectedTime = DateTime.Now.TimeOfDay;
             _timeEntry = new Entry
             {
-                Text = _selectedTime.ToString(@"hh\:mm\:ss"),
-                Keyboard = Keyboard.Text,
+                Text = DateTime.Now.TimeOfDay.ToString(@"hh\:mm\:ss"),
                 HorizontalOptions = LayoutOptions.FillAndExpand,
-                VerticalOptions = LayoutOptions.Center,
-                Margin = new Thickness(0),
-                BackgroundColor = Colors.Transparent 
+                VerticalOptions = LayoutOptions.Center
             };
             _timeEntry.TextChanged += OnTimeEntryTextChanged;
 
@@ -60,40 +80,48 @@ namespace Custom.MAUI.Calendar
             {
                 Text = "▼",
                 FontSize = 10,
-                WidthRequest = 5,
+                WidthRequest = 20,
                 HeightRequest = 20,
                 Padding = 0,
-                BackgroundColor = Colors.Transparent, 
+                BackgroundColor = Colors.Transparent,
                 TextColor = Colors.Black,
-                BorderWidth = 0,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center
+                BorderWidth = 0
             };
             _dropdownButton.Clicked += (s, e) => ToggleTimePickerPopup();
 
-            // Создаем AbsoluteLayout для наложения кнопки поверх Entry
-            var absoluteLayout = new AbsoluteLayout
-            {
-                WidthRequest = 120,
-                HeightRequest = 60
-            };
-
-
+            _absoluteLayout = new AbsoluteLayout();
             AbsoluteLayout.SetLayoutFlags(_timeEntry, AbsoluteLayoutFlags.All);
             AbsoluteLayout.SetLayoutBounds(_timeEntry, new Rect(0, 0, 1, 1));
-            absoluteLayout.Children.Add(_timeEntry);
+            _absoluteLayout.Children.Add(_timeEntry);
 
             AbsoluteLayout.SetLayoutFlags(_dropdownButton, AbsoluteLayoutFlags.PositionProportional);
-            AbsoluteLayout.SetLayoutBounds(_dropdownButton, new Rect(1, 0.5, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize)); // Сдвигаем кнопку к правому краю и центрируем по вертикали
+            AbsoluteLayout.SetLayoutBounds(_dropdownButton, new Rect(0.95, 0.5, AbsoluteLayout.AutoSize, AbsoluteLayout.AutoSize));
+            _absoluteLayout.Children.Add(_dropdownButton);
 
-            absoluteLayout.Children.Add(_dropdownButton);
+            Content = _absoluteLayout;
 
-            this.Children.Add(absoluteLayout);
+            UpdateLayout();
         }
 
+        private void UpdateLayout()
+        {
+            WidthRequest = CustomWidth;
+            HeightRequest = CustomHeight;
 
+            if (CustomWidth <= 0 || CustomHeight <= 0)
+                return;
 
+            double scaleFactor = Math.Min(CustomWidth / 150.0, CustomHeight / 40.0); // 150 и 40 - базовые значения по умолчанию
 
+            // Масштабируем размеры элементов
+            _timeEntry.WidthRequest = CustomWidth - (20 * scaleFactor);
+            _timeEntry.HeightRequest = CustomHeight;
+            _timeEntry.FontSize = 14 * scaleFactor;
+
+            _dropdownButton.WidthRequest = 20 * scaleFactor;
+            _dropdownButton.HeightRequest = 20 * scaleFactor;
+            _dropdownButton.FontSize = 10 * scaleFactor;
+        }
 
         private void ToggleTimePickerPopup()
         {
