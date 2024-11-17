@@ -30,12 +30,6 @@ namespace Custom.MAUI.Calendar.Views
                 RowSpacing = 5, 
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                ColumnDefinitions =
-                {
-                    new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Auto },
-                    new ColumnDefinition { Width = GridLength.Auto }
-                },
                 RowDefinitions =
                 {
                     new RowDefinition { Height = GridLength.Auto },
@@ -48,18 +42,21 @@ namespace Custom.MAUI.Calendar.Views
 
             if (TimeFormat.Contains("hh"))
             {
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 AddTimeComponent(grid, "Hour", 0, 23, _selectedTime.Hours, value => UpdateSelectedTime(value, _selectedTime.Minutes, _selectedTime.Seconds), currentColumn);
                 currentColumn++;
             }
 
             if (TimeFormat.Contains("mm"))
             {
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 AddTimeComponent(grid, "Minute", 0, 59, _selectedTime.Minutes, value => UpdateSelectedTime(_selectedTime.Hours, value, _selectedTime.Seconds), currentColumn);
                 currentColumn++;
             }
 
             if (TimeFormat.Contains("ss"))
             {
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 AddTimeComponent(grid, "Second", 0, 59, _selectedTime.Seconds, value => UpdateSelectedTime(_selectedTime.Hours, _selectedTime.Minutes, value), currentColumn);
                 currentColumn++;
             }
