@@ -9,7 +9,6 @@ namespace Custom.MAUI.Components
 {
     public class CustomTimePicker : ContentView
     {
-        private TimeSpan _selectedTime = DateTime.Now.TimeOfDay;
         private Entry _timeEntry;
         private Button _dropdownButton;
         private AbsoluteLayout _absoluteLayout;
@@ -72,7 +71,6 @@ namespace Custom.MAUI.Components
         {
             if (bindable is CustomTimePicker timePicker && newValue is TimeSpan newTime)
             {
-                timePicker._selectedTime = newTime;
                 timePicker._timeEntry.Text = timePicker.FormatTime(newTime);
             }
         }
@@ -105,7 +103,6 @@ namespace Custom.MAUI.Components
 
         public CustomTimePicker()
         {
-            _selectedTime = SelectedTime;
             _timeEntry = new Entry
             {
                 Text = FormatTime(SelectedTime),
@@ -211,7 +208,7 @@ namespace Custom.MAUI.Components
         private void OnPopupTimeSelected(object sender, TimeSpan e)
         {
             SelectedTime = e;
-            TimeSelected?.Invoke(this, _selectedTime);
+            TimeSelected?.Invoke(this, SelectedTime);
         }
 
         private void OnPopupClosed(object sender, PopupClosedEventArgs e)
@@ -259,22 +256,22 @@ namespace Custom.MAUI.Components
             input = FormatPartialInput(input);
 
             //Для TimeSpan нужен формат вида hh\\:mm
-            string TimeSpanFormat = TimeFormat.ToLower().Replace(":", "\\:");
-            if (TimeSpan.TryParseExact(input, TimeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
+            string timeSpanFormat = TimeFormat.ToLower().Replace(":", "\\:");
+            if (TimeSpan.TryParseExact(input, timeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
             {
                 SelectedTime = parsedTime;
-                TimeEntryCompleted?.Invoke(this, _selectedTime);
+                TimeEntryCompleted?.Invoke(this, SelectedTime);
             }
             else
             {
                 // Если формат некорректен, возвращаем последнее корректное значение
-                _timeEntry.Text = FormatTime(_selectedTime);
+                _timeEntry.Text = FormatTime(SelectedTime);
             }
         }
 
         private void UpdateTimeDisplayFormat(string format)
         {
-            _timeEntry.Text = FormatTime(_selectedTime);
+            _timeEntry.Text = FormatTime(SelectedTime);
             _popup?.Close();
             _popup = new TimePickerPopup(SelectedTime, TimeFormat);
             _popup.Style = this.Style;
@@ -352,6 +349,7 @@ namespace Custom.MAUI.Components
 
             return input;
         }
+
 
         private string CorrectHours(string[] parts)
         {
