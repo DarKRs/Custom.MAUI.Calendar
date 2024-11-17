@@ -105,9 +105,10 @@ namespace Custom.MAUI.Components
 
         public CustomTimePicker()
         {
+            _selectedTime = SelectedTime;
             _timeEntry = new Entry
             {
-                Text = FormatTime(_selectedTime),
+                Text = FormatTime(SelectedTime),
                 HorizontalOptions = LayoutOptions.FillAndExpand,
                 VerticalOptions = LayoutOptions.Center,
                 Placeholder = TimeFormat,
@@ -159,7 +160,10 @@ namespace Custom.MAUI.Components
 
             Content.BackgroundColor = Style.BackgroundColor;
 
-            _popup.Style = this.Style;
+            if (_popup != null)
+            {
+                _popup.Style = this.Style;
+            }
         }
 
         private void UpdateLayout()
@@ -186,7 +190,7 @@ namespace Custom.MAUI.Components
         {
             if (_popup == null)
             {
-                _popup = new TimePickerPopup(_selectedTime, TimeFormat)
+                _popup = new TimePickerPopup(SelectedTime, TimeFormat)
                 {
                     Style = this.Style
                 };
@@ -206,8 +210,7 @@ namespace Custom.MAUI.Components
 
         private void OnPopupTimeSelected(object sender, TimeSpan e)
         {
-            _selectedTime = e;
-            _timeEntry.Text = FormatTime(_selectedTime);
+            SelectedTime = e;
             TimeSelected?.Invoke(this, _selectedTime);
         }
 
@@ -259,9 +262,7 @@ namespace Custom.MAUI.Components
             string TimeSpanFormat = TimeFormat.ToLower().Replace(":", "\\:");
             if (TimeSpan.TryParseExact(input, TimeSpanFormat, CultureInfo.InvariantCulture, out TimeSpan parsedTime))
             {
-
-                _selectedTime = parsedTime;
-                _timeEntry.Text = FormatTime(_selectedTime);
+                SelectedTime = parsedTime;
                 TimeEntryCompleted?.Invoke(this, _selectedTime);
             }
             else
@@ -275,7 +276,10 @@ namespace Custom.MAUI.Components
         {
             _timeEntry.Text = FormatTime(_selectedTime);
             _popup?.Close();
-            _popup = new TimePickerPopup(_selectedTime, TimeFormat);
+            _popup = new TimePickerPopup(SelectedTime, TimeFormat);
+            _popup.Style = this.Style;
+            _popup.TimeSelected += OnPopupTimeSelected;
+            _popup.Closed += OnPopupClosed;
         }
 
         private string FormatTime(TimeSpan time)

@@ -18,10 +18,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.001</Version>
     <PackageId>Custom.MAUI.Components</PackageId>
     <Authors>DarKRs</Authors>
-    <Description>Настраиваемый компонент календаря для .NET MAUI</Description>
+    <Description>Настраиваемые компоненты для .NET MAUI</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DarKRs/Custom.MAUI.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DarKRs/Custom.MAUI.Components</RepositoryUrl>

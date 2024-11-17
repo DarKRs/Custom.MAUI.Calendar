@@ -12,7 +12,7 @@
                               DayFontSize="16"
                               />
         <customstyles:TimePickerStyle x:Key="MyTimePickerStyle"
-                                BackgroundColor="White"
+                                BackgroundColor="DarkBlue"
                                 TimeEntryTextColor="Yellow"
                                 TimeEntryFontSize="14"
                                 />
