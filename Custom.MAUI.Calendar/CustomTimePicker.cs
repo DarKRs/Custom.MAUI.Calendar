@@ -9,6 +9,7 @@ using Microsoft.Maui.Layouts;
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Maui.Core;
 using Custom.MAUI.Calendar.Views;
+using Custom.MAUI.Calendar.Styles;
 
 namespace Custom.MAUI.Calendar
 {
@@ -26,6 +27,7 @@ namespace Custom.MAUI.Calendar
         public event EventHandler PopupOpened;
         public event EventHandler PopupClosed;
         public event EventHandler<string> TimeEntryTextChanged;
+        public event EventHandler<TimePickerStyle> StyleChanged;
 
         public static readonly BindableProperty SelectedTimeProperty = BindableProperty.Create(
             nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker), DateTime.Now.TimeOfDay, propertyChanged: OnSelectedTimeChanged);
@@ -63,6 +65,15 @@ namespace Custom.MAUI.Calendar
             set => SetValue(TimeFormatProperty, value);
         }
 
+        public static readonly BindableProperty StyleProperty =
+            BindableProperty.Create(nameof(Style), typeof(TimePickerStyle), typeof(CustomTimePicker), new TimePickerStyle(), propertyChanged: OnStyleChanged);
+
+        public TimePickerStyle Style
+        {
+            get => (TimePickerStyle)GetValue(StyleProperty);
+            set => SetValue(StyleProperty, value);
+        }
+
         private static void OnSelectedTimeChanged(BindableObject bindable, object oldValue, object newValue)
         {
             if (bindable is CustomTimePicker timePicker && newValue is TimeSpan newTime)
@@ -86,6 +97,15 @@ namespace Custom.MAUI.Calendar
             {
                 customTimePicker.UpdateTimeDisplayFormat(newFormat);
                 customTimePicker.TimeFormatChanged?.Invoke(customTimePicker, newFormat);
+            }
+        }
+
+        private static void OnStyleChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomTimePicker customTimePicker)
+            {
+                customTimePicker.ApplyStyles();
+                customTimePicker.StyleChanged?.Invoke(customTimePicker, customTimePicker.Style);
             }
         }
 
@@ -130,6 +150,24 @@ namespace Custom.MAUI.Calendar
             UpdateLayout();
         }
 
+        private void ApplyStyles()
+        {
+            _timeEntry.BackgroundColor = Style.TimeEntryBackgroundColor;
+            _timeEntry.TextColor = Style.TimeEntryTextColor;
+            _timeEntry.FontSize = Style.TimeEntryFontSize;
+            _timeEntry.Margin = Style.TimeEntryPadding;
+
+            _dropdownButton.BackgroundColor = Style.DropdownButtonBackgroundColor;
+            _dropdownButton.TextColor = Style.DropdownButtonTextColor;
+            _dropdownButton.WidthRequest = Style.DropdownButtonSize;
+            _dropdownButton.FontSize = Style.DropdownButtonFontSize;
+            _dropdownButton.Padding = Style.DropdownButtonPadding;
+
+            Content.BackgroundColor = Style.BackgroundColor;
+
+            _popup.Style = this.Style;
+        }
+
         private void UpdateLayout()
         {
             WidthRequest = CustomWidth;
@@ -154,7 +192,9 @@ namespace Custom.MAUI.Calendar
         {
             if (_popup == null)
             {
-                _popup = new TimePickerPopup(_selectedTime, TimeFormat);
+                _popup = new TimePickerPopup(_selectedTime, TimeFormat){
+                    Style = this.Style
+                };
                 _popup.TimeSelected += OnPopupTimeSelected;
                 _popup.Closed += OnPopupClosed;
                 PopupOpened?.Invoke(this, EventArgs.Empty);

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Views;
+using Custom.MAUI.Calendar.Styles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,13 @@ using System.Threading.Tasks;
 
 namespace Custom.MAUI.Calendar.Views
 {
-    public class TimePickerPopup : Popup
+    internal class TimePickerPopup : Popup
     {
         private TimeSpan _selectedTime;
         private string TimeFormat;
         public event EventHandler<TimeSpan> TimeSelected;
+
+        public TimePickerStyle Style { get; set; } = new TimePickerStyle();
 
         public TimePickerPopup(TimeSpan initialTime, string format)
         {
@@ -72,10 +75,10 @@ namespace Custom.MAUI.Calendar.Views
             Content = new Frame
             {
                 Content = stackLayout,
-                CornerRadius = 10,
-                BackgroundColor = Colors.White,
-                Padding = new Thickness(5), 
-                Margin = new Thickness(5),  
+                CornerRadius = Style.PopupCornerRadius,
+                BackgroundColor = Style.PopupBackgroundColor,
+                Padding = Style.PopupPadding, 
+                Margin = Style.PopupMargin,  
                 HasShadow = true,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
@@ -87,9 +90,9 @@ namespace Custom.MAUI.Calendar.Views
             var label = new Label
             {
                 Text = labelText,
-                TextColor = Colors.Black,
+                TextColor = Style.PopupTextColor,
                 HorizontalOptions = LayoutOptions.Center,
-                FontSize = 14,
+                FontSize = Style.PopupFontSize,
                 FontAttributes = FontAttributes.Bold,
                 Padding = new Thickness(0, 0, 0, 2)
             };
@@ -122,10 +125,10 @@ namespace Custom.MAUI.Calendar.Views
                     Text = i.ToString("D2"),
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
-                    Padding = new Thickness(10, 5),
-                    FontSize = 12,
-                    TextColor = i == selectedValue ? Colors.White : Colors.Black,
-                    BackgroundColor = i == selectedValue ? Colors.Purple : Colors.Transparent,
+                    Padding = Style.TimeComponentPadding,
+                    FontSize = Style.PopupFontSize,
+                    TextColor = i == selectedValue ? Style.TimeComponentSelectedTextColor : Style.PopupTextColor,
+                    BackgroundColor = i == selectedValue ? Style.TimeComponentSelectedBackgroundColor : Style.TimeComponentBackgroundColor,
                     Margin = new Thickness(3),
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center
@@ -144,12 +147,12 @@ namespace Custom.MAUI.Calendar.Views
                         {
                             if (child is Label lbl)
                             {
-                                lbl.BackgroundColor = Colors.Transparent;
-                                lbl.TextColor = Colors.Black;
+                                lbl.BackgroundColor = Style.TimeComponentBackgroundColor;
+                                lbl.TextColor = Style.PopupTextColor;
                             }
                         }
-                        label.BackgroundColor = Colors.Purple;
-                        label.TextColor = Colors.White;
+                        label.BackgroundColor = Style.TimeComponentSelectedBackgroundColor;
+                        label.TextColor = Style.TimeComponentSelectedTextColor;
                         onValueSelected(int.Parse(label.Text));
 
                         // Программная прокрутка, чтобы выделенный элемент оставался по центру
