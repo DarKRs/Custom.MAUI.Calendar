@@ -13,9 +13,6 @@ namespace AppForTest
         {
             InitializeComponent();
             //Calendar.Culture = CultureInfo.GetCultureInfo("fr-FR");
-            Calendar.Style = new CalendarStyle() { 
-                LabelTextColor = Colors.Yellow,
-            };
 
             Calendar.DateSelected += OnDateSelected;
             Calendar.DateDeselected += Calendar_DateDeselected;

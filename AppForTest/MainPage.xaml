@@ -1,23 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:Custom.MAUI.Calendar;assembly=Custom.MAUI.Calendar"
+             xmlns:custom="clr-namespace:Custom.MAUI.Calendar;assembly=Custom.MAUI.Calendar"
+             xmlns:customstyles="clr-namespace:Custom.MAUI.Calendar.Styles;assembly=Custom.MAUI.Calendar"
              xmlns:sysglb="clr-namespace:System.Globalization;assembly=netstandard"
              x:Class="AppForTest.MainPage">
-
+    <ContentPage.Resources>
+        <customstyles:CalendarStyle x:Key="MyCalendarStyle"
+                              BackgroundColor="LightGray"
+                              DayTextColor="Blue"
+                              DayFontSize="16"
+                              />
+        <customstyles:TimePickerStyle x:Key="MyTimePickerStyle"
+                                BackgroundColor="White"
+                                TimeEntryTextColor="Yellow"
+                                TimeEntryFontSize="14"
+                                />
+    </ContentPage.Resources>
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
 
-            <controls:CustomCalendar x:Name="Calendar"
-                      DisplayMode="SeparateMonthYear">
-            </controls:CustomCalendar>
+            <custom:CustomCalendar x:Name="Calendar" DisplayMode="SeparateMonthYear" Style="{StaticResource MyCalendarStyle}"/>
 
-
-            <StackLayout>
-                <controls:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm"/>
-            </StackLayout>
+            <custom:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm" Style="{StaticResource MyTimePickerStyle}"/>
 
             <Label x:Name="SelectedDateLabel"
                 Text="Hello, World!"

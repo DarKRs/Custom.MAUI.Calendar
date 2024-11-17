@@ -10,7 +10,6 @@ namespace Custom.MAUI.Calendar.Styles
     {
         // **Общие настройки**
         public Color BackgroundColor { get; set; } = Colors.White; // Фон компонента
-        public Color TextColor { get; set; } = Colors.Black; // Цвет текста
 
         // **Настройки текстового ввода времени**
         public Color TimeEntryBackgroundColor { get; set; } = Colors.Transparent; // Фон текстового поля ввода
