@@ -21,6 +21,11 @@ namespace Custom.MAUI.Calendar
         private TimePickerPopup _popup;
 
         public event EventHandler<TimeSpan> TimeSelected;
+        public event EventHandler<string> TimeFormatChanged;
+        public event EventHandler<TimeSpan> TimeEntryCompleted;
+        public event EventHandler PopupOpened;
+        public event EventHandler PopupClosed;
+        public event EventHandler<string> TimeEntryTextChanged;
 
         public static readonly BindableProperty SelectedTimeProperty = BindableProperty.Create(
             nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker), DateTime.Now.TimeOfDay, propertyChanged: OnSelectedTimeChanged);
@@ -80,6 +85,7 @@ namespace Custom.MAUI.Calendar
             if (bindable is CustomTimePicker customTimePicker && newValue is string newFormat)
             {
                 customTimePicker.UpdateTimeDisplayFormat(newFormat);
+                customTimePicker.TimeFormatChanged?.Invoke(customTimePicker, newFormat);
             }
         }
 
@@ -151,13 +157,14 @@ namespace Custom.MAUI.Calendar
                 _popup = new TimePickerPopup(_selectedTime, TimeFormat);
                 _popup.TimeSelected += OnPopupTimeSelected;
                 _popup.Closed += OnPopupClosed;
-
+                PopupOpened?.Invoke(this, EventArgs.Empty);
                 var currentPage = GetCurrentPage();
                 await currentPage?.ShowPopupAsync(_popup);
             }
             else
             {
                 _popup.Close();
+                PopupClosed?.Invoke(this, EventArgs.Empty);
                 _popup = null;
             }
         }
@@ -200,7 +207,9 @@ namespace Custom.MAUI.Calendar
                 if (originalCursorPosition < input.Length)
                     entry.CursorPosition = originalCursorPosition;
                 else
-                    entry.CursorPosition = input.Length; 
+                    entry.CursorPosition = input.Length;
+
+                TimeEntryTextChanged?.Invoke(this, input);
             }
         }
 
@@ -218,6 +227,7 @@ namespace Custom.MAUI.Calendar
 
                 _selectedTime = parsedTime;
                 _timeEntry.Text = FormatTime(_selectedTime);
+                TimeEntryCompleted?.Invoke(this, _selectedTime);
             }
             else
             {
