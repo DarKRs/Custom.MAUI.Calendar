@@ -18,19 +18,19 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.21</Version>
-    <PackageId>Custom.MAUI.Calendar</PackageId>
+    <Version>1.0.0</Version>
+    <PackageId>Custom.MAUI.Components</PackageId>
     <Authors>DarKRs</Authors>
     <Description>Настраиваемый компонент календаря для .NET MAUI</Description>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/DarKRs/Custom.MAUI.Calendar</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DarKRs/Custom.MAUI.Calendar</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/DarKRs/Custom.MAUI.Components</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DarKRs/Custom.MAUI.Components</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.83" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.83" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
     <None Include="..\LICENSE.txt" Pack="true" PackagePath="" />
 	</ItemGroup>

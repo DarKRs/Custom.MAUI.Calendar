@@ -1,7 +1,7 @@
-﻿using Custom.MAUI.Calendar;
+﻿using Custom.MAUI.Components;
 using System.Diagnostics;
 using System.Globalization;
-using Custom.MAUI.Calendar.Styles;
+using Custom.MAUI.Components.Styles;
 
 namespace AppForTest
 {

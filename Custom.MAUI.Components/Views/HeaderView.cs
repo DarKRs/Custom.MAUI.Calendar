@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Custom.MAUI.Components.Styles;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Custom.MAUI.Calendar.Styles;
 
-namespace Custom.MAUI.Calendar.Views
+namespace Custom.MAUI.Components.Views
 {
     internal class HeaderView : ContentView, IDisposable
     {

@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using Microsoft.Maui.Controls;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Maui.Layouts;
+﻿using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Maui.Core;
-using Custom.MAUI.Calendar.Views;
-using Custom.MAUI.Calendar.Styles;
+using Custom.MAUI.Components.Styles;
+using Custom.MAUI.Components.Views;
+using Microsoft.Maui.Layouts;
+using System.Globalization;
 
-namespace Custom.MAUI.Calendar
+namespace Custom.MAUI.Components
 {
     public class CustomTimePicker : ContentView
     {
@@ -30,7 +24,7 @@ namespace Custom.MAUI.Calendar
         public event EventHandler<TimePickerStyle> StyleChanged;
 
         public static readonly BindableProperty SelectedTimeProperty = BindableProperty.Create(
-            nameof(SelectedTime),typeof(TimeSpan),typeof(CustomTimePicker), DateTime.Now.TimeOfDay, propertyChanged: OnSelectedTimeChanged);
+            nameof(SelectedTime), typeof(TimeSpan), typeof(CustomTimePicker), DateTime.Now.TimeOfDay, propertyChanged: OnSelectedTimeChanged);
 
         public TimeSpan SelectedTime
         {
@@ -39,7 +33,7 @@ namespace Custom.MAUI.Calendar
         }
 
         public static readonly BindableProperty CustomWidthProperty = BindableProperty.Create(
-            nameof(CustomWidth),typeof(double),typeof(CustomTimePicker),120.0, propertyChanged: OnSizePropertyChanged);
+            nameof(CustomWidth), typeof(double), typeof(CustomTimePicker), 120.0, propertyChanged: OnSizePropertyChanged);
 
         public double CustomWidth
         {
@@ -48,7 +42,7 @@ namespace Custom.MAUI.Calendar
         }
 
         public static readonly BindableProperty CustomHeightProperty = BindableProperty.Create(
-            nameof(CustomHeight),typeof(double),typeof(CustomTimePicker),45.0, propertyChanged: OnSizePropertyChanged);
+            nameof(CustomHeight), typeof(double), typeof(CustomTimePicker), 45.0, propertyChanged: OnSizePropertyChanged);
 
         public double CustomHeight
         {
@@ -192,7 +186,8 @@ namespace Custom.MAUI.Calendar
         {
             if (_popup == null)
             {
-                _popup = new TimePickerPopup(_selectedTime, TimeFormat){
+                _popup = new TimePickerPopup(_selectedTime, TimeFormat)
+                {
                     Style = this.Style
                 };
                 _popup.TimeSelected += OnPopupTimeSelected;

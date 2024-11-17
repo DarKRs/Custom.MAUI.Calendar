@@ -1,13 +1,8 @@
-﻿using Custom.MAUI.Calendar.Styles;
-using Custom.MAUI.Calendar.Views;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using Custom.MAUI.Components.Styles;
+using Custom.MAUI.Components.Views;
 using System.Globalization;
-using System.Linq;
 
-namespace Custom.MAUI.Calendar
+namespace Custom.MAUI.Components
 {
     public class DayTappedEventArgs : EventArgs
     {

@@ -1,36 +1,66 @@
-# CustomCalendar for .NET MAUI
+# Custom MAUI Components
 
-**CustomCalendar** — это настраиваемый календарный компонент для .NET MAUI.
+Этот репозиторий содержит настраиваемые компоненты для .NET MAUI. На данный момент календарь и TimePicker
 
 ## Возможности
 
+### CustomCalendar
 - **Выбор даты или диапазона дат**.
 - **Поддержка локализации** через свойство `Culture`.
 - **Настройка внешнего вида** через класс `CalendarStyle`.
 - **События для обработки взаимодействия** (выбор даты, изменение месяца и др.).
+
+### CustomTimePicker
+- **Ввод времени вручную или через Popup**
+- **Поддержка различных форматов времени (`HH:mm:ss`, `HH:mm` и т.д.).**
+- **События для отслеживания изменения времени.**
+- **Настройка внешнего вида** через класс `TimePickerStyle`.
 
 ## Установка
 
 Установите пакет через NuGet Package Manager:
 
 ```bash
-dotnet add package Custom.MAUI.Calendar
+dotnet add package Custom.MAUI.Components
 ```
+или
+```bash
+Install-Package Custom.MAUI.Components
+```
+
+**Важно:** Для использования CustomTimePicker так же нужно установить CommunityToolkit.Maui
+И добавить строку UseMauiCommunityToolkit(); в ваш MauiProgram
+
+```csharp
+var builder = MauiApp.CreateBuilder();
+builder
+    .UseMauiApp<App>()
+    .UseMauiCommunityToolkit()
+    .ConfigureFonts(fonts =>
+    {
+        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+    });
+```
+
 ## Использование
 
 ```xaml
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:Custom.MAUI.Calendar;assembly=Custom.MAUI.Calendar"
+             xmlns:custom="clr-namespace:Custom.MAUI.Components;assembly=Custom.MAUI.Components"
              x:Class="YourNamespace.MainPage">
 
-    <controls:CustomCalendar x:Name="MyCalendar" />
+           <custom:CustomCalendar x:Name="Calendar" DisplayMode="SeparateMonthYear" />
+
+           <custom:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm" />
+
 </ContentPage>
 ```
 
 В этом примере будут использоваться стили по умолчанию.
 
-### Режимы отображения
+### Режимы отображения календаря
 
 - "Default" Месяц и год отображаются в одном Label
 - "SeparateMonthFixedYear" Месяц и год отображаются в разных Label. Есть кнопки смены месяца
@@ -72,75 +102,43 @@ public MainPage()
 }
 ```
 
-### Настройка стиля
+### Настройка и использование стилей
 
 ```xaml
-            <controls:CustomCalendar x:Name="Calendar">
-                <controls:CustomCalendar.Style>
-                    <controls:CalendarStyle
-                        BackgroundColor="LightYellow"
-                        DayTextColor="DarkBlue"
-                        TodayBackgroundColor="LightGreen"
-                        SelectedDateBackgroundColor="Orange"
-                        NavigationButtonBackgroundColor="Gray"
-                        NavigationButtonTextColor="White"
-                        LabelTextColor="DarkRed"
-                        LabelFontSize="20"
-                        DayFontSize="16"
-                        DayButtonPadding="10"
-                        NavigationButtonSize="50"
-                        NavigationButtonCornerRadius="25" />
-                </controls:CustomCalendar.Style>
-            </controls:CustomCalendar>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:custom="clr-namespace:Custom.MAUI.Components;assembly=Custom.MAUI.Components"
+             xmlns:customstyles="clr-namespace:Custom.MAUI.Components.Styles;assembly=Custom.MAUI.Components"
+             x:Class="YourNamespace.MainPage">
+
+<custom:CustomCalendar x:Name="Calendar" DisplayMode="SeparateMonthYear" Style="{StaticResource MyCalendarStyle}"/>
+
+<custom:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm" Style="{StaticResource MyTimePickerStyle}"/>
+
+</ContentPage>
 ```
 
 
-### Использование событий
+### Список событий
 
-```xaml
-    <controls:CustomCalendar x:Name="Calendar"
-                             DateSelected="OnDateSelected"
-                             DateRangeSelected="OnDateRangeSelected" />
-```
-
-```csharp
-public partial class MainPage : ContentPage
-{
-    int count = 0;
-
-    public MainPage()
-    {
-        InitializeComponent();
-        Calendar.DateSelected += OnDateSelected;
-        Calendar.DateRangeSelected += OnDateRangeSelected;
-    }
-
-    private void OnDateSelected(object sender, DateTime selectedDate)
-    {
-        // Обновляем Label с выбранной датой
-        SelectedDateLabel.Text = $"Вы выбрали дату: {selectedDate:d}";
-    }
-
-    private void OnDateRangeSelected(object sender, (DateTime, DateTime) dateRange)
-    {
-        // Обновляем Label с выбранным диапазоном дат
-        DateRangeLabel.Text = $"Вы выбрали диапазон: {dateRange.Item1:d} - {dateRange.Item2:d}";
-    }
-}
-```
-
-#### Список событий
+#### События календаря
 
 - **DateSelected**  — срабатывает при выборе даты.
 - **DateRangeSelected**  — срабатывает при выборе диапазона дат.
 - **MonthChanged** — срабатывает при изменении месяца.
 - **YearChanged**  — срабатывает при изменении года.
 - **ViewModeChanged**  — срабатывает при изменении режима отображения.
-- **DayLongPressed**  — срабатывает при долгом нажатии на день.
 - **DateDeselected**  — срабатывает при снятии выделения с даты.
 - **DateRangeCleared**  — срабатывает при очистке выбранного диапазона дат.
 - **CultureChanged**  — срабатывает при изменении культуры.
 - **StyleChanged**  — срабатывает при изменении стиля.
-- **HeaderTapped**  — срабатывает при нажатии на заголовок.
-- **DayOfWeekLabelTapped**  — срабатывает при нажатии на название дня недели.
 
+#### События TimePicker
+
+- **TimeSelected** — срабатывает при выборе времени.
+- **TimeFormatChanged** — срабатывает при изменении формата времени.
+- **TimeEntryCompleted** — срабатывает, когда пользователь завершает ввод времени.
+- **PopupOpened** — срабатывает при открытии всплывающего окна выбора времени.
+- **PopupClosed** — срабатывает при закрытии всплывающего окна выбора времени.
+- **TimeEntryTextChanged** — срабатывает при изменении текста в поле ввода времени.
+- **StyleChanged** — срабатывает при изменении стиля.

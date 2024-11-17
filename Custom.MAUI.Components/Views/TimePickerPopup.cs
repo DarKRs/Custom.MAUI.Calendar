@@ -1,13 +1,7 @@
-﻿using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Views;
-using Custom.MAUI.Calendar.Styles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Maui.Views;
+using Custom.MAUI.Components.Styles;
 
-namespace Custom.MAUI.Calendar.Views
+namespace Custom.MAUI.Components.Views
 {
     internal class TimePickerPopup : Popup
     {
@@ -30,7 +24,7 @@ namespace Custom.MAUI.Calendar.Views
             {
                 BackgroundColor = Colors.Transparent,
                 ColumnSpacing = 15,
-                RowSpacing = 5, 
+                RowSpacing = 5,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 RowDefinitions =
@@ -67,7 +61,7 @@ namespace Custom.MAUI.Calendar.Views
             var stackLayout = new StackLayout
             {
                 Children = { grid },
-                Padding = new Thickness(5), 
+                Padding = new Thickness(5),
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
             };
@@ -77,8 +71,8 @@ namespace Custom.MAUI.Calendar.Views
                 Content = stackLayout,
                 CornerRadius = Style.PopupCornerRadius,
                 BackgroundColor = Style.PopupBackgroundColor,
-                Padding = Style.PopupPadding, 
-                Margin = Style.PopupMargin,  
+                Padding = Style.PopupPadding,
+                Margin = Style.PopupMargin,
                 HasShadow = true,
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center
