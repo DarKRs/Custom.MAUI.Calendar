@@ -5,6 +5,20 @@ namespace Custom.MAUI.Components.Views
 {
     internal class HeaderView : ContentView, IDisposable
     {
+        private double _scaleFactor = 1.0;
+        public double ScaleFactor
+        {
+            get => _scaleFactor;
+            set
+            {
+                if (_scaleFactor != value)
+                {
+                    _scaleFactor = value;
+                    InitializeHeader();
+                }
+            }
+        }
+
         public event EventHandler PreviousMonthClicked;
         public event EventHandler NextMonthClicked;
         public event EventHandler PreviousYearClicked;
@@ -68,7 +82,6 @@ namespace Custom.MAUI.Components.Views
 
         public HeaderView()
         {
-            InitializeHeader();
         }
 
         private void InitializeHeader()
@@ -150,12 +163,17 @@ namespace Custom.MAUI.Components.Views
             var button = new Button
             {
                 Text = text,
-                WidthRequest = Style?.NavigationButtonSize ?? 40,
-                HeightRequest = Style?.NavigationButtonSize ?? 40,
-                Padding = Style?.NavigationButtonPadding ?? new Thickness(5),
+                WidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
+                HeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
+                MinimumHeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
+                MinimumWidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
+                Padding = new Thickness((Style?.NavigationButtonPadding.Left ?? 5) * ScaleFactor,
+                                        (Style?.NavigationButtonPadding.Top ?? 5) * ScaleFactor,
+                                        (Style?.NavigationButtonPadding.Right ?? 5) * ScaleFactor,
+                                        (Style?.NavigationButtonPadding.Bottom ?? 5) * ScaleFactor),
                 BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
                 TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
-                CornerRadius = (int)(Style?.NavigationButtonCornerRadius ?? 20)
+                CornerRadius = (int)((Style?.NavigationButtonCornerRadius ?? 20) * ScaleFactor)
             };
             button.Clicked += clickedHandler;
             return button;
@@ -167,7 +185,7 @@ namespace Custom.MAUI.Components.Views
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = Style?.LabelFontSize ?? 18,
+                FontSize = (Style?.LabelFontSize ?? 18) * ScaleFactor,
                 TextColor = Style?.LabelTextColor ?? Colors.Black,
             };
         }

@@ -18,7 +18,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.001</Version>
+    <Version>1.0.1</Version>
     <PackageId>Custom.MAUI.Components</PackageId>
     <Authors>DarKRs</Authors>
     <Description>Настраиваемые компоненты для .NET MAUI</Description>

@@ -53,6 +53,25 @@ namespace Custom.MAUI.Components
         public event EventHandler<CultureInfo> CultureChanged;
         public event EventHandler<CalendarStyle> StyleChanged;
 
+        public static readonly BindableProperty CustomWidthProperty = BindableProperty.Create(
+            nameof(CustomWidth), typeof(double), typeof(CustomCalendar), 300.0, propertyChanged: OnSizePropertyChanged);
+
+        public double CustomWidth
+        {
+            get => (double)GetValue(CustomWidthProperty);
+            set => SetValue(CustomWidthProperty, value);
+        }
+
+        public static readonly BindableProperty CustomHeightProperty = BindableProperty.Create(
+            nameof(CustomHeight), typeof(double), typeof(CustomCalendar), 400.0, propertyChanged: OnSizePropertyChanged);
+
+
+        public double CustomHeight
+        {
+            get => (double)GetValue(CustomHeightProperty);
+            set => SetValue(CustomHeightProperty, value);
+        }
+
         public static readonly BindableProperty DisplayModeProperty =
             BindableProperty.Create(nameof(DisplayMode), typeof(CalendarDisplayMode), typeof(CustomCalendar), CalendarDisplayMode.Default, propertyChanged: OnDisplayModeChanged);
 
@@ -89,7 +108,8 @@ namespace Custom.MAUI.Components
                 DisplayMode = DisplayMode,
                 CurrentDate = _currentDate,
                 Culture = Culture,
-                Style = Style
+                Style = Style,
+                ScaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0)
             };
             _headerView.PreviousMonthClicked += OnPreviousMonthClicked;
             _headerView.NextMonthClicked += OnNextMonthClicked;
@@ -106,7 +126,8 @@ namespace Custom.MAUI.Components
                 Culture = Culture,
                 Style = Style,
                 MinDate = MinDate,
-                MaxDate = MaxDate
+                MaxDate = MaxDate,
+                ScaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0)
             };
             _daysGridView.DaySelected += OnDaySelected;
             _daysGridView.MonthSelected += OnMonthSelected;
@@ -119,6 +140,14 @@ namespace Custom.MAUI.Components
             };
 
             Content = mainLayout;
+        }
+
+        private static void OnSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            if (bindable is CustomCalendar customCalendar)
+            {
+                customCalendar.UpdateLayout();
+            }
         }
 
         private static void OnDisplayModeChanged(BindableObject bindable, object oldValue, object newValue)
@@ -155,6 +184,25 @@ namespace Custom.MAUI.Components
         {
             _headerView.Style = Style;
             _daysGridView.Style = Style;
+        }
+
+        private void UpdateLayout()
+        {
+            WidthRequest = CustomWidth;
+            HeightRequest = CustomHeight;
+
+            double scaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0);
+
+            if (_headerView != null)
+            {
+                _headerView.ScaleFactor = scaleFactor;
+            }
+
+            if (_daysGridView != null)
+            {
+                _daysGridView.ScaleFactor = scaleFactor;
+                _daysGridView.BuildGrid();
+            }
         }
 
         private void OnPreviousMonthClicked(object sender, EventArgs e) => ChangeDate(months: -1);

@@ -1,10 +1,12 @@
 ﻿using Custom.MAUI.Components.Styles;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Custom.MAUI.Components.Views
 {
     internal class DaysGridView : Grid, IDisposable
     {
+        public double ScaleFactor { get; set; } = 1.0;
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
 
@@ -114,11 +116,6 @@ namespace Custom.MAUI.Components.Views
             BuildBaseGrid(7, 7);
             AddDaysOfWeekLabels();
 
-            RowSpacing = 5;
-            ColumnSpacing = 5;
-            VerticalOptions = LayoutOptions.Fill;
-            HorizontalOptions = LayoutOptions.Fill;
-
             var firstDayOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
             int startDay = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
 
@@ -145,8 +142,13 @@ namespace Custom.MAUI.Components.Views
                     BindingContext = currentDay,
                     BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                     TextColor = Style?.DayTextColor ?? Colors.Black,
-                    FontSize = Style?.DayFontSize ?? 14,
-                    Padding = Style?.DayButtonPadding ?? new Thickness(5),
+                    FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
+                    Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
+                                            (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
+                                            (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
+                                            (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
+                    WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
+                    HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.FillAndExpand
                 };
@@ -223,7 +225,13 @@ namespace Custom.MAUI.Components.Views
                         CommandParameter = index + 1,
                         BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = Style?.DayFontSize ?? 14
+                        FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
+                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
+                                                (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
+                                                (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
+                                                (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
+                        WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
+                        HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
                     };
                     monthButton.Clicked += (s, e) =>
                     {
@@ -269,7 +277,13 @@ namespace Custom.MAUI.Components.Views
                         CommandParameter = year,
                         BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = Style?.DayFontSize ?? 14
+                        FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
+                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
+                                               (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
+                                               (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
+                                               (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
+                        WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
+                        HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
                     };
                     yearButton.Clicked += (s, e) =>
                     {
@@ -349,7 +363,9 @@ namespace Custom.MAUI.Components.Views
                     VerticalOptions = LayoutOptions.Center,
                     FontAttributes = FontAttributes.Bold,
                     TextColor = Style?.DayOfWeekLabelTextColor ?? Colors.Black,
-                    FontSize = Style?.DayOfWeekLabelFontSize ?? 14
+                    FontSize = (Style?.DayOfWeekLabelFontSize ?? 14) * ScaleFactor,
+                    HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
+                    WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor
                 };
                 Grid.SetColumn(dayLabel, i);
                 Grid.SetRow(dayLabel, 0);

@@ -16,7 +16,7 @@
         // **Настройки навигационных кнопок**
         public Color NavigationButtonBackgroundColor { get; set; } = Colors.LightGray; // Фон кнопок навигации
         public Color NavigationButtonTextColor { get; set; } = Colors.Black; // Цвет текста кнопок навигации
-        public double NavigationButtonSize { get; set; } = 40; // Размер кнопок навигации
+        public double NavigationButtonSize { get; set; } = 20; // Размер кнопок навигации
         public double NavigationButtonCornerRadius { get; set; } = 20; // Радиус скругления кнопок навигации
         public Thickness NavigationButtonPadding { get; set; } = new Thickness(5); // Отступы кнопок навигации
 
@@ -27,6 +27,8 @@
         // **Настройки дней недели**
         public Color DayOfWeekLabelTextColor { get; set; } = Colors.Black; // Цвет текста названий дней недели
         public double DayOfWeekLabelFontSize { get; set; } = 14; // Размер шрифта названий дней недели
+        public double DaysButtonHeight { get; set; } = 20;
+        public double DaysButtonWidth { get; set; } = 20;
 
     }
 }
