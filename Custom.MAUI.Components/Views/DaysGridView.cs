@@ -6,7 +6,19 @@ namespace Custom.MAUI.Components.Views
 {
     internal class DaysGridView : Grid, IDisposable
     {
-        public double ScaleFactor { get; set; } = 1.0;
+        private double _scaleFactor = 1.0;
+        public double ScaleFactor
+        {
+            get => _scaleFactor;
+            set
+            {
+                if (_scaleFactor != value)
+                {
+                    _scaleFactor = value;
+                    BuildGrid();
+                }
+            }
+        }
         public DateTime MinDate { get; set; } = new DateTime(1900, 1, 1);
         public DateTime MaxDate { get; set; } = new DateTime(2100, 12, 31);
 
@@ -73,11 +85,12 @@ namespace Custom.MAUI.Components.Views
             }
         }
 
-        public CalendarStyle Style { get; set; }
+        public CalendarStyle? Style { get; set; }
 
-        public DaysGridView()
+        public DaysGridView(CalendarStyle calendarStyle)
         {
             _currentYearPage = (_currentDate.Year - MinDate.Year) / 12;
+            Style = calendarStyle;
             BuildGrid();
         }
 

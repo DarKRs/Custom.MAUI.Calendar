@@ -120,7 +120,7 @@ namespace Custom.MAUI.Components
             _headerView.YearLabelTapped += OnYearLabelTapped;
             _headerView.MonthYearLabelTapped += OnMonthYearLabelTapped;
 
-            _daysGridView = new DaysGridView
+            _daysGridView = new DaysGridView(Style)
             {
                 CurrentDate = _currentDate,
                 SelectedDates = _selectedDates,
@@ -147,7 +147,16 @@ namespace Custom.MAUI.Components
                 }
             };
 
-            mainGrid.BackgroundColor = Style.BackgroundColor;
+            var styledFrame = new Frame
+            {
+                Content = mainGrid,
+                CornerRadius = 10,
+                Padding = Style.FramePadding,
+                HasShadow = true, 
+                BorderColor = Colors.Black,
+                Margin= Style.FrameMargin,
+                BackgroundColor = Style.BackgroundColor
+            };
 
             mainGrid.Children.Add(_headerView);
             Grid.SetRow(_headerView, 0);
@@ -157,7 +166,7 @@ namespace Custom.MAUI.Components
             Grid.SetRow(_daysGridView, 1);
             Grid.SetColumn(_daysGridView, 0);
 
-            Content = mainGrid;
+            Content = styledFrame;
         }
 
         private static void OnSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -211,17 +220,11 @@ namespace Custom.MAUI.Components
 
             double scaleFactor = Math.Min(CustomWidth / 360.0, CustomHeight / 240.0);
 
-
             if (_headerView != null)
-            {
                 _headerView.ScaleFactor = scaleFactor;
-            }
 
             if (_daysGridView != null)
-            {
                 _daysGridView.ScaleFactor = scaleFactor;
-                _daysGridView.BuildGrid();
-            }
         }
 
         private void OnPreviousMonthClicked(object sender, EventArgs e) => ChangeDate(months: -1);

@@ -4,6 +4,8 @@
     {
         // **Общие настройки**
         public Color BackgroundColor { get; set; } = Colors.White; // Фон всего календаря
+        public Thickness FramePadding { get; set; } = new Thickness(0);
+        public Thickness FrameMargin { get; set; } = new Thickness(0);
 
         // **Настройки дней**
         public Color DayTextColor { get; set; } = Colors.Black; // Цвет текста дней
