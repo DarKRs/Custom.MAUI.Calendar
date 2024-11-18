@@ -97,23 +97,23 @@ namespace Custom.MAUI.Components.Views
             }
         }
 
-        private void BuildBaseGrid(int rows, int columns)
+        private void BuildBaseGrid(int rows, int columns, GridLength gridLength)
         {
             Children.Clear();
             RowDefinitions.Clear();
             ColumnDefinitions.Clear();
 
             for (int i = 0; i < rows; i++)
-                RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                RowDefinitions.Add(new RowDefinition { Height = gridLength });
 
             for (int i = 0; i < columns; i++)
-                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                ColumnDefinitions.Add(new ColumnDefinition { Width = gridLength });
         }
 
         private void BuildDaysView()
         {
             _dayButtons.Clear();
-            BuildBaseGrid(7, 7);
+            BuildBaseGrid(7, 7, GridLength.Auto);
             AddDaysOfWeekLabels();
 
             var firstDayOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
@@ -150,7 +150,7 @@ namespace Custom.MAUI.Components.Views
                     MinimumHeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
                     MinimumWidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
-                    VerticalOptions = LayoutOptions.FillAndExpand
+                    VerticalOptions = LayoutOptions.FillAndExpand,
                 };
 
                 dayButton.Clicked += (s, e) =>
@@ -207,7 +207,7 @@ namespace Custom.MAUI.Components.Views
         {
             int columns = 3;
             int rows = 4;
-            BuildBaseGrid(rows, columns);
+            BuildBaseGrid(rows, columns, GridLength.Star);
 
             var months = _culture.DateTimeFormat.MonthNames.Take(12).ToArray();
 
@@ -223,15 +223,11 @@ namespace Custom.MAUI.Components.Views
                     {
                         Text = months[index],
                         CommandParameter = index + 1,
-                        BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
+                        BackgroundColor = Style?.MonthButtonBackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
-                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
-                                                (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
-                                                (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
-                                                (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
-                        WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
-                        HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
+                        FontSize = (Style?.MonthFontSize ?? 14) * ScaleFactor,
+                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 2) * ScaleFactor),
+                        CornerRadius = Style.MonthCornerRadius,
                     };
                     monthButton.Clicked += (s, e) =>
                     {
@@ -254,7 +250,7 @@ namespace Custom.MAUI.Components.Views
         {
             int columns = 3;
             int rows = 5;
-            BuildBaseGrid(rows, columns);
+            BuildBaseGrid(rows, columns, GridLength.Star);
 
             int startYear = _currentYearPage * 12 + MinDate.Year;
             int endYear = startYear + 11;

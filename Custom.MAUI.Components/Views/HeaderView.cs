@@ -164,14 +164,9 @@ namespace Custom.MAUI.Components.Views
             {
                 Text = text,
                 FontAttributes = FontAttributes.Bold,
-                WidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
-                HeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
                 MinimumHeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
                 MinimumWidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
-                Padding = new Thickness((Style?.NavigationButtonPadding.Left ?? 5) * ScaleFactor,
-                                        (Style?.NavigationButtonPadding.Top ?? 5) * ScaleFactor,
-                                        (Style?.NavigationButtonPadding.Right ?? 5) * ScaleFactor,
-                                        (Style?.NavigationButtonPadding.Bottom ?? 5) * ScaleFactor),
+                Padding = new Thickness((Style?.NavigationButtonPadding.Left ?? 5) * ScaleFactor),
                 BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
                 TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
                 CornerRadius = (int)((Style?.NavigationButtonCornerRadius ?? 20) * ScaleFactor)

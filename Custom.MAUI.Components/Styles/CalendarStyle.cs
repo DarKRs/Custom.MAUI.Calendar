@@ -16,21 +16,26 @@
         public Color DateRangeBackgroundColor { get; set; } = Colors.LightGreen; // Фон диапазона дат
         public double DaysButtonHeight { get; set; } = 20;
         public double DaysButtonWidth { get; set; } = 50;
+
+        public double MonthFontSize { get; set; } = 14; //Размер шрифта месяцев в выборе месяцев
+        public int MonthCornerRadius { get; set; } = 0; 
+        public Color MonthButtonBackgroundColor { get; set; } = Color.FromArgb("#E3F2FD"); // Фон кнопок выбора месяца
+
         // **Настройки навигационных кнопок**
         public Color NavigationButtonBackgroundColor { get; set; } = Colors.Transparent; // Фон кнопок навигации
         public Color NavigationButtonTextColor { get; set; } = Colors.Black; // Цвет текста кнопок навигации
-        public double NavigationButtonSize { get; set; } = 30; // Размер кнопок навигации
+        public double NavigationButtonSize { get; set; } = 20; // Размер кнопок навигации
         public double NavigationButtonCornerRadius { get; set; } = 30; // Радиус скругления кнопок навигации
         public Thickness NavigationButtonPadding { get; set; } = new Thickness(2); // Отступы внутри кнопок навигации
         public Thickness NavigationButtonMargin { get; set; } = new Thickness(5); // Отступы внешние
 
         // **Настройки заголовков и меток**
         public Color LabelTextColor { get; set; } = Colors.Black; // Цвет текста меток (месяц, год, дни недели)
-        public double LabelFontSize { get; set; } = 18; // Размер шрифта меток
+        public double LabelFontSize { get; set; } = 16; // Размер шрифта меток
 
         // **Настройки дней недели**
         public Color DayOfWeekLabelTextColor { get; set; } = Colors.Black; // Цвет текста названий дней недели
-        public double DayOfWeekLabelFontSize { get; set; } = 14; // Размер шрифта названий дней недели
+        public double DayOfWeekLabelFontSize { get; set; } = 12; // Размер шрифта названий дней недели
 
 
     }
