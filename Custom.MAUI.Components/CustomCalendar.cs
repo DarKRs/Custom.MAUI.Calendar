@@ -1,5 +1,6 @@
 ﻿using Custom.MAUI.Components.Styles;
 using Custom.MAUI.Components.Views;
+using System.Data.Common;
 using System.Globalization;
 
 namespace Custom.MAUI.Components
@@ -54,7 +55,7 @@ namespace Custom.MAUI.Components
         public event EventHandler<CalendarStyle> StyleChanged;
 
         public static readonly BindableProperty CustomWidthProperty = BindableProperty.Create(
-            nameof(CustomWidth), typeof(double), typeof(CustomCalendar), 300.0, propertyChanged: OnSizePropertyChanged);
+            nameof(CustomWidth), typeof(double), typeof(CustomCalendar), 360.0, propertyChanged: OnSizePropertyChanged);
 
         public double CustomWidth
         {
@@ -63,7 +64,7 @@ namespace Custom.MAUI.Components
         }
 
         public static readonly BindableProperty CustomHeightProperty = BindableProperty.Create(
-            nameof(CustomHeight), typeof(double), typeof(CustomCalendar), 400.0, propertyChanged: OnSizePropertyChanged);
+            nameof(CustomHeight), typeof(double), typeof(CustomCalendar), 240.0, propertyChanged: OnSizePropertyChanged);
 
 
         public double CustomHeight
@@ -109,7 +110,7 @@ namespace Custom.MAUI.Components
                 CurrentDate = _currentDate,
                 Culture = Culture,
                 Style = Style,
-                ScaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0)
+                ScaleFactor = Math.Min(CustomWidth / 360.0, CustomHeight / 240.0)
             };
             _headerView.PreviousMonthClicked += OnPreviousMonthClicked;
             _headerView.NextMonthClicked += OnNextMonthClicked;
@@ -127,19 +128,36 @@ namespace Custom.MAUI.Components
                 Style = Style,
                 MinDate = MinDate,
                 MaxDate = MaxDate,
-                ScaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0)
+                ScaleFactor = Math.Min(CustomWidth / 360.0, CustomHeight / 240.0),
             };
             _daysGridView.DaySelected += OnDaySelected;
             _daysGridView.MonthSelected += OnMonthSelected;
             _daysGridView.YearSelected += OnYearSelected;
 
-            var mainLayout = new StackLayout
+            var mainGrid = new Grid
             {
-                BackgroundColor = Style?.BackgroundColor,
-                Children = { _headerView, _daysGridView }
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition { Width = GridLength.Star }
+                },
+                            RowDefinitions =
+                {
+                    new RowDefinition { Height = GridLength.Auto },
+                    new RowDefinition { Height = GridLength.Star }
+                }
             };
 
-            Content = mainLayout;
+            mainGrid.BackgroundColor = Style?.BackgroundColor;
+
+            mainGrid.Children.Add(_headerView);
+            Grid.SetRow(_headerView, 0);
+            Grid.SetColumn(_headerView, 0);
+
+            mainGrid.Children.Add(_daysGridView);
+            Grid.SetRow(_daysGridView, 1);
+            Grid.SetColumn(_daysGridView, 0);
+
+            Content = mainGrid;
         }
 
         private static void OnSizePropertyChanged(BindableObject bindable, object oldValue, object newValue)
@@ -191,7 +209,8 @@ namespace Custom.MAUI.Components
             WidthRequest = CustomWidth;
             HeightRequest = CustomHeight;
 
-            double scaleFactor = Math.Min(CustomWidth / 300.0, CustomHeight / 400.0);
+            double scaleFactor = Math.Min(CustomWidth / 360.0, CustomHeight / 240.0);
+
 
             if (_headerView != null)
             {

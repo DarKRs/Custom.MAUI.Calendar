@@ -104,10 +104,10 @@ namespace Custom.MAUI.Components.Views
             ColumnDefinitions.Clear();
 
             for (int i = 0; i < rows; i++)
-                RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+                RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             for (int i = 0; i < columns; i++)
-                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+                ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         }
 
         private void BuildDaysView()
@@ -140,15 +140,15 @@ namespace Custom.MAUI.Components.Views
                 {
                     Text = day.ToString(),
                     BindingContext = currentDay,
-                    BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
+                    BackgroundColor = Style?.DayButtonBackgroundColor ?? Colors.Transparent,
                     TextColor = Style?.DayTextColor ?? Colors.Black,
                     FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
-                    Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
-                                            (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
-                                            (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
-                                            (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
+                    Padding = new Thickness((Style?.DayButtonPadding.Right ?? 2) * ScaleFactor),
+                    Margin = new Thickness((Style?.DayButtonMargin.Right ?? 2) * ScaleFactor),
                     WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
                     HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
+                    MinimumHeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
+                    MinimumWidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.FillAndExpand
                 };
@@ -278,10 +278,6 @@ namespace Custom.MAUI.Components.Views
                         BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
                         TextColor = Style?.LabelTextColor ?? Colors.Black,
                         FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
-                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 5) * ScaleFactor,
-                                               (Style?.DayButtonPadding.Top ?? 5) * ScaleFactor,
-                                               (Style?.DayButtonPadding.Right ?? 5) * ScaleFactor,
-                                               (Style?.DayButtonPadding.Bottom ?? 5) * ScaleFactor),
                         WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
                         HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
                     };
@@ -340,6 +336,7 @@ namespace Custom.MAUI.Components.Views
                 WidthRequest = Style?.NavigationButtonSize ?? 40,
                 HeightRequest = Style?.NavigationButtonSize ?? 40,
                 Padding = Style?.NavigationButtonPadding ?? new Thickness(5),
+                Margin = Style?.NavigationButtonMargin ?? 5,
                 BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
                 TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
                 CornerRadius = (int)(Style?.NavigationButtonCornerRadius ?? 20)
@@ -364,8 +361,6 @@ namespace Custom.MAUI.Components.Views
                     FontAttributes = FontAttributes.Bold,
                     TextColor = Style?.DayOfWeekLabelTextColor ?? Colors.Black,
                     FontSize = (Style?.DayOfWeekLabelFontSize ?? 14) * ScaleFactor,
-                    HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
-                    WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor
                 };
                 Grid.SetColumn(dayLabel, i);
                 Grid.SetRow(dayLabel, 0);

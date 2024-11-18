@@ -22,9 +22,9 @@
             Padding="30,0"
             Spacing="25">
 
-            <custom:CustomCalendar x:Name="Calendar" CustomWidth="380" CustomHeight="300" DisplayMode="SeparateMonthYear" Style="{StaticResource MyCalendarStyle}"/>
+            <custom:CustomCalendar x:Name="Calendar" CustomWidth="420" CustomHeight="240" DisplayMode="SeparateMonthYear" />
 
-            <custom:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm" Style="{StaticResource MyTimePickerStyle}"/>
+            <custom:CustomTimePicker TimeSelected="OnTimeSelected" CustomWidth="200" CustomHeight="50" TimeFormat="HH:mm" />
 
             <Label x:Name="SelectedDateLabel"
                 Text="Hello, World!"

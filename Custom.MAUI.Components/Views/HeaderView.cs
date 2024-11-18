@@ -163,6 +163,7 @@ namespace Custom.MAUI.Components.Views
             var button = new Button
             {
                 Text = text,
+                FontAttributes = FontAttributes.Bold,
                 WidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
                 HeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
                 MinimumHeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
