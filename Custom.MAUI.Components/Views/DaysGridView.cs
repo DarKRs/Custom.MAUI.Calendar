@@ -140,15 +140,15 @@ namespace Custom.MAUI.Components.Views
                 {
                     Text = day.ToString(),
                     BindingContext = currentDay,
-                    BackgroundColor = Style?.DayButtonBackgroundColor ?? Colors.Transparent,
-                    TextColor = Style?.DayTextColor ?? Colors.Black,
-                    FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
-                    Padding = new Thickness((Style?.DayButtonPadding.Right ?? 2) * ScaleFactor),
-                    Margin = new Thickness((Style?.DayButtonMargin.Right ?? 2) * ScaleFactor),
-                    WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
-                    HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
-                    MinimumHeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
-                    MinimumWidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
+                    BackgroundColor = Style.DayButtonBackgroundColor,
+                    TextColor = Style.DayTextColor,
+                    FontSize = Style.DayFontSize  * ScaleFactor,
+                    Padding = new Thickness(Style.DayButtonPadding.Right * ScaleFactor),
+                    Margin = new Thickness(Style.DayButtonMargin.Right  * ScaleFactor),
+                    WidthRequest = Style.DaysButtonWidth * ScaleFactor,
+                    HeightRequest = Style.DaysButtonHeight * ScaleFactor,
+                    MinimumHeightRequest = Style.DaysButtonHeight * ScaleFactor,
+                    MinimumWidthRequest = Style.DaysButtonWidth * ScaleFactor,
                     HorizontalOptions = LayoutOptions.FillAndExpand,
                     VerticalOptions = LayoutOptions.FillAndExpand,
                 };
@@ -168,7 +168,7 @@ namespace Custom.MAUI.Components.Views
                 // Выделение сегодняшнего дня
                 if (currentDay.Date == DateTime.Today)
                 {
-                    dayButton.BackgroundColor = Style?.TodayBackgroundColor ?? Colors.LightBlue;
+                    dayButton.BackgroundColor = Style.TodayBackgroundColor;
                 }
 
                 // Выделение выбранных дат
@@ -178,14 +178,14 @@ namespace Custom.MAUI.Components.Views
                     {
                         if (currentDay.Date == _selectedDates[0].Date)
                         {
-                            dayButton.BackgroundColor = Style?.SelectedDateBackgroundColor ?? Colors.LightGreen;
+                            dayButton.BackgroundColor = Style.SelectedDateBackgroundColor;
                         }
                     }
                     else if (_selectedDates.Count == 2)
                     {
                         if (currentDay.Date >= _selectedDates[0].Date && currentDay.Date <= _selectedDates[1].Date)
                         {
-                            dayButton.BackgroundColor = Style?.DateRangeBackgroundColor ?? Colors.LightGreen;
+                            dayButton.BackgroundColor = Style.DateRangeBackgroundColor;
                         }
                     }
                 }
@@ -223,10 +223,10 @@ namespace Custom.MAUI.Components.Views
                     {
                         Text = months[index],
                         CommandParameter = index + 1,
-                        BackgroundColor = Style?.MonthButtonBackgroundColor ?? Colors.Transparent,
-                        TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = (Style?.MonthFontSize ?? 14) * ScaleFactor,
-                        Padding = new Thickness((Style?.DayButtonPadding.Left ?? 2) * ScaleFactor),
+                        BackgroundColor = Style.MonthButtonBackgroundColor,
+                        TextColor = Style.LabelTextColor,
+                        FontSize = Style.MonthFontSize * ScaleFactor,
+                        Padding = new Thickness(Style.DayButtonPadding.Left  * ScaleFactor),
                         CornerRadius = Style.MonthCornerRadius,
                     };
                     monthButton.Clicked += (s, e) =>
@@ -271,11 +271,10 @@ namespace Custom.MAUI.Components.Views
                     {
                         Text = year.ToString(),
                         CommandParameter = year,
-                        BackgroundColor = Style?.BackgroundColor ?? Colors.Transparent,
-                        TextColor = Style?.LabelTextColor ?? Colors.Black,
-                        FontSize = (Style?.DayFontSize ?? 14) * ScaleFactor,
-                        WidthRequest = (Style?.DaysButtonWidth ?? 20) * ScaleFactor,
-                        HeightRequest = (Style?.DaysButtonHeight ?? 20) * ScaleFactor,
+                        BackgroundColor = Style.MonthButtonBackgroundColor,
+                        TextColor = Style.LabelTextColor,
+                        FontSize = Style.DayFontSize * ScaleFactor,
+                        CornerRadius = Style.MonthCornerRadius,
                     };
                     yearButton.Clicked += (s, e) =>
                     {
@@ -329,13 +328,13 @@ namespace Custom.MAUI.Components.Views
             var button = new Button
             {
                 Text = text,
-                WidthRequest = Style?.NavigationButtonSize ?? 40,
-                HeightRequest = Style?.NavigationButtonSize ?? 40,
-                Padding = Style?.NavigationButtonPadding ?? new Thickness(5),
-                Margin = Style?.NavigationButtonMargin ?? 5,
-                BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
-                TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
-                CornerRadius = (int)(Style?.NavigationButtonCornerRadius ?? 20)
+                WidthRequest = Style.NavigationButtonSize,
+                HeightRequest = Style.NavigationButtonSize,
+                Padding = Style.NavigationButtonPadding,
+                Margin = Style.NavigationButtonMargin,
+                BackgroundColor = Style.NavigationButtonBackgroundColor,
+                TextColor = Style.NavigationButtonTextColor,
+                CornerRadius = Style.NavigationButtonCornerRadius
             };
             button.Clicked += clickedHandler;
             return button;
@@ -355,8 +354,8 @@ namespace Custom.MAUI.Components.Views
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center,
                     FontAttributes = FontAttributes.Bold,
-                    TextColor = Style?.DayOfWeekLabelTextColor ?? Colors.Black,
-                    FontSize = (Style?.DayOfWeekLabelFontSize ?? 14) * ScaleFactor,
+                    TextColor = Style.DayOfWeekLabelTextColor,
+                    FontSize = Style.DayOfWeekLabelFontSize * ScaleFactor,
                 };
                 Grid.SetColumn(dayLabel, i);
                 Grid.SetRow(dayLabel, 0);

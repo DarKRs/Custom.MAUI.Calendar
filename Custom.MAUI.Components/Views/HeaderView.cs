@@ -164,12 +164,12 @@ namespace Custom.MAUI.Components.Views
             {
                 Text = text,
                 FontAttributes = FontAttributes.Bold,
-                MinimumHeightRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
-                MinimumWidthRequest = (Style?.NavigationButtonSize ?? 20) * ScaleFactor,
-                Padding = new Thickness((Style?.NavigationButtonPadding.Left ?? 5) * ScaleFactor),
-                BackgroundColor = Style?.NavigationButtonBackgroundColor ?? Colors.LightGray,
-                TextColor = Style?.NavigationButtonTextColor ?? Colors.Black,
-                CornerRadius = (int)((Style?.NavigationButtonCornerRadius ?? 20) * ScaleFactor)
+                MinimumHeightRequest = Style.NavigationButtonSize * ScaleFactor,
+                MinimumWidthRequest = Style.NavigationButtonSize * ScaleFactor,
+                Padding = new Thickness(Style.NavigationButtonPadding.Left * ScaleFactor),
+                BackgroundColor = Style.NavigationButtonBackgroundColor,
+                TextColor = Style.NavigationButtonTextColor,
+                CornerRadius = Style.NavigationButtonCornerRadius 
             };
             button.Clicked += clickedHandler;
             return button;
@@ -181,8 +181,8 @@ namespace Custom.MAUI.Components.Views
             {
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
-                FontSize = (Style?.LabelFontSize ?? 18) * ScaleFactor,
-                TextColor = Style?.LabelTextColor ?? Colors.Black,
+                FontSize = Style.LabelFontSize * ScaleFactor,
+                TextColor = Style.LabelTextColor,
             };
         }
 

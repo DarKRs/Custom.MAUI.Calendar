@@ -25,7 +25,7 @@
         public Color NavigationButtonBackgroundColor { get; set; } = Colors.Transparent; // Фон кнопок навигации
         public Color NavigationButtonTextColor { get; set; } = Colors.Black; // Цвет текста кнопок навигации
         public double NavigationButtonSize { get; set; } = 20; // Размер кнопок навигации
-        public double NavigationButtonCornerRadius { get; set; } = 30; // Радиус скругления кнопок навигации
+        public int NavigationButtonCornerRadius { get; set; } = 30; // Радиус скругления кнопок навигации
         public Thickness NavigationButtonPadding { get; set; } = new Thickness(2); // Отступы внутри кнопок навигации
         public Thickness NavigationButtonMargin { get; set; } = new Thickness(5); // Отступы внешние
 

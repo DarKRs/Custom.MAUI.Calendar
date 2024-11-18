@@ -147,7 +147,7 @@ namespace Custom.MAUI.Components
                 }
             };
 
-            mainGrid.BackgroundColor = Style?.BackgroundColor;
+            mainGrid.BackgroundColor = Style.BackgroundColor;
 
             mainGrid.Children.Add(_headerView);
             Grid.SetRow(_headerView, 0);
